@@ -1,0 +1,56 @@
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+metadata:
+  name: infraforge
+
+# Single server + 2 agents — enough to schedule platform services
+# (prometheus, grafana, loki, argocd) without starving the API workloads.
+servers: 1
+agents: 2
+
+image: rancher/k3s:v1.29.2-k3s1
+
+# Local registry so images built by the dev loop can be pushed without
+# round-tripping through ECR / Docker Hub.
+registries:
+  create:
+    name: registry.localhost
+    host: "0.0.0.0"
+    hostPort: "5000"
+  config: |
+    mirrors:
+      "registry.localhost:5000":
+        endpoint:
+          - http://registry.localhost:5000
+
+ports:
+  # Traefik ingress — UI and API are exposed through here
+  - port: 8080:80
+    nodeFilters:
+      - loadbalancer
+  - port: 8443:443
+    nodeFilters:
+      - loadbalancer
+  # Grafana
+  - port: 3000:3000
+    nodeFilters:
+      - loadbalancer
+  # Prometheus
+  - port: 9090:9090
+    nodeFilters:
+      - loadbalancer
+
+options:
+  k3d:
+    wait: true
+    timeout: "120s"
+  k3s:
+    extraArgs:
+      # We deploy our own ingress via Helm in some scenarios; keep traefik
+      # for the default local flow but disable servicelb to avoid port clashes.
+      - arg: --disable=servicelb
+        nodeFilters:
+          - server:*
+  kubeconfig:
+    updateDefaultKubeconfig: true
+    switchCurrentContext: true
