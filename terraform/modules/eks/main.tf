@@ -43,6 +43,10 @@ resource "aws_security_group_rule" "cluster_egress" {
 # -----------------------------------------------------------------------------
 # CloudWatch log group for EKS control plane logs (must exist before cluster)
 # -----------------------------------------------------------------------------
+# 💰 Cost estimate (us-east-1):
+#   ~$0.50/GB ingested + ~$0.03/GB-month stored.
+#   With api/audit/authenticator logs enabled, expect ~1-3 GB/day for a small
+#   cluster → ~$15-50/month. Trim retention_in_days to control storage cost.
 
 resource "aws_cloudwatch_log_group" "cluster" {
   name              = "/aws/eks/${local.cluster_name}/cluster"
@@ -54,6 +58,11 @@ resource "aws_cloudwatch_log_group" "cluster" {
 # -----------------------------------------------------------------------------
 # EKS Cluster
 # -----------------------------------------------------------------------------
+# 💰 Cost estimate (us-east-1):
+#   EKS control plane is a flat $0.10/hour per cluster → ~$73/month.
+#   This is the unavoidable baseline — independent of node count or workload.
+#   Extended support versions add an extra $0.50/hour (~$365/month) — keep
+#   cluster_version on a supported release to avoid this surcharge.
 
 resource "aws_eks_cluster" "this" {
   name     = local.cluster_name
@@ -144,6 +153,14 @@ resource "aws_security_group_rule" "node_egress" {
 # -----------------------------------------------------------------------------
 # Managed Node Groups
 # -----------------------------------------------------------------------------
+# 💰 Cost estimate (us-east-1, on-demand, per node, 730 hr/month):
+#   t3.medium  (2 vCPU,  4 GiB) → ~$30.37/month
+#   t3.large   (2 vCPU,  8 GiB) → ~$60.74/month
+#   m5.large   (2 vCPU,  8 GiB) → ~$70.08/month
+#   m5.xlarge  (4 vCPU, 16 GiB) → ~$140.16/month
+#   Spot pricing typically saves 60-70% but workloads must tolerate interruption.
+#   EBS gp3 root volume (default 20 GiB) adds ~$1.60/node/month.
+#   Default desired_size=2 on t3.medium → ~$64/month for the data plane.
 
 resource "aws_eks_node_group" "this" {
   for_each = var.node_groups

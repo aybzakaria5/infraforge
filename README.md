@@ -25,6 +25,19 @@ InfraForge supports two deployment modes sharing identical modules and charts:
 
 See [docs/architecture.md](docs/architecture.md) for the full architecture overview, layer breakdown, and request flow.
 
+## Status
+
+Built in phases. Current state:
+
+- ✅ **Phase 1 — Foundation**: repo scaffolding, VPC and IAM modules, pre-commit hooks, architecture doc
+- ✅ **Phase 2 — Kubernetes & Data**: EKS (managed node groups + OIDC), RDS PostgreSQL (Multi-AZ + backups), S3 (versioning + lifecycle), ECR (lifecycle policies), LocalStack provider, k3d cluster config, `docker-compose.dev.yml`, one-command local bootstrap (`scripts/local-setup.sh`)
+- ⏳ **Phase 3 — CI/CD & GitOps**: GitLab pipeline, Helm charts, ArgoCD app-of-apps
+- ⏳ **Phase 4 — Go API**
+- ⏳ **Phase 5 — React Dashboard**
+- ⏳ **Phase 6 — Observability**
+- ⏳ **Phase 7 — Security & Policies**
+- ⏳ **Phase 8 — Documentation & Polish**
+
 ## Tech Stack
 
 **Infrastructure & IaC**

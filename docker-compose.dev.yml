@@ -1,0 +1,71 @@
+# Local development stack for InfraForge.
+# Brings up the AWS simulation layer (LocalStack), the application
+# database (Postgres), and a Docker registry that k3d can pull from.
+#
+# Start: docker compose -f docker-compose.dev.yml up -d
+# Stop:  docker compose -f docker-compose.dev.yml down -v
+
+services:
+  localstack:
+    image: localstack/localstack:3.4
+    container_name: infraforge-localstack
+    ports:
+      - "4566:4566"           # edge port — all AWS APIs
+      - "4510-4559:4510-4559" # external service port range
+    environment:
+      - SERVICES=s3,iam,sts,ec2,eks,rds,sqs,sns,secretsmanager,cloudwatch,dynamodb,kms,ecr,route53
+      - DEBUG=0
+      - PERSISTENCE=1
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - LS_LOG=warn
+    volumes:
+      - localstack-data:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:4566/_localstack/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - infraforge
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: infraforge-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: infraforge
+      POSTGRES_PASSWORD: infraforge
+      POSTGRES_DB: infraforge
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U infraforge -d infraforge"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - infraforge
+
+  registry:
+    image: registry:2
+    container_name: infraforge-registry
+    ports:
+      - "5000:5000"
+    environment:
+      REGISTRY_STORAGE_DELETE_ENABLED: "true"
+    volumes:
+      - registry-data:/var/lib/registry
+    networks:
+      - infraforge
+
+volumes:
+  localstack-data:
+  postgres-data:
+  registry-data:
+
+networks:
+  infraforge:
+    name: infraforge-dev
+    driver: bridge
