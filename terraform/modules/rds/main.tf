@@ -94,6 +94,10 @@ resource "aws_db_parameter_group" "this" {
 # -----------------------------------------------------------------------------
 # Enhanced Monitoring IAM Role
 # -----------------------------------------------------------------------------
+# 💰 Cost estimate (us-east-1):
+#   The IAM role itself is free. Enhanced Monitoring metrics are delivered to
+#   CloudWatch Logs and billed at ~$0.30/GB ingested. At a 60s interval expect
+#   <$2/month per instance; at 1s interval this can climb past $20/month.
 
 resource "aws_iam_role" "monitoring" {
   count = var.monitoring_interval > 0 ? 1 : 0
@@ -124,6 +128,25 @@ resource "aws_iam_role_policy_attachment" "monitoring" {
 # -----------------------------------------------------------------------------
 # RDS PostgreSQL Instance
 # -----------------------------------------------------------------------------
+# 💰 Cost estimate (us-east-1, PostgreSQL, on-demand, 730 hr/month):
+#
+#   Instance compute (single-AZ):
+#     db.t3.micro    (2 vCPU,  1 GiB) → ~$12.41/month
+#     db.t3.small    (2 vCPU,  2 GiB) → ~$24.82/month
+#     db.t3.medium   (2 vCPU,  4 GiB) → ~$49.64/month
+#     db.m5.large    (2 vCPU,  8 GiB) → ~$124.83/month
+#     db.m5.xlarge   (4 vCPU, 16 GiB) → ~$249.66/month
+#   ⚠ Multi-AZ DOUBLES the compute cost (a standby instance runs 24/7).
+#
+#   Storage (gp3): ~$0.115/GB-month — also doubled under Multi-AZ.
+#     20 GB single-AZ ≈ $2.30/mo  |  100 GB Multi-AZ ≈ $23.00/mo
+#
+#   Backups: storage equal to DB size is free; beyond that ~$0.095/GB-month.
+#   Performance Insights: free with the default 7-day retention window.
+#   CloudWatch logs export (postgresql/upgrade): ~$0.50/GB ingested.
+#
+#   Typical small prod baseline (db.t3.small Multi-AZ + 50 GB gp3):
+#     ~$50/mo compute + ~$11.50/mo storage ≈ $62/month before backups/logs.
 
 resource "aws_db_instance" "this" {
   identifier = local.identifier
