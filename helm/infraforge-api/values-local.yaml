@@ -1,0 +1,40 @@
+# Local dev overrides (k3d + LocalStack)
+replicaCount: 1
+
+image:
+  repository: localhost:5050/infraforge-api
+  tag: "dev"
+  pullPolicy: Always
+
+ingress:
+  enabled: true
+  className: traefik
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+  hosts:
+    - host: api.infraforge.local
+      paths:
+        - path: /
+          pathType: Prefix
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 250m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false
+
+config:
+  logLevel: "debug"
+  logFormat: "text"
+
+env:
+  DATABASE_URL: "postgres://infraforge:infraforge@postgresql:5432/infraforge?sslmode=disable"
+  AWS_ENDPOINT: "http://localstack:4566"
+  AWS_REGION: "us-east-1"
+  AWS_ACCESS_KEY_ID: "test"
+  AWS_SECRET_ACCESS_KEY: "test"
