@@ -1,0 +1,44 @@
+# AWS deployment overrides
+replicaCount: 2
+
+image:
+  repository: ""  # set via CI: <account-id>.dkr.ecr.<region>.amazonaws.com/infraforge-ui
+  tag: ""         # set via CI: git SHA
+  pullPolicy: IfNotPresent
+
+ingress:
+  enabled: true
+  className: alb
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    alb.ingress.kubernetes.io/certificate-arn: ""  # set per environment
+    alb.ingress.kubernetes.io/healthcheck-path: /healthz
+  hosts:
+    - host: infraforge.dev
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: infraforge-ui-tls
+      hosts:
+        - infraforge.dev
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 64Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 8
+  targetCPUUtilizationPercentage: 75
+
+nginx:
+  apiUpstream: "http://infraforge-api:8080"

@@ -1,0 +1,111 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "infraforge-ui.fullname" . }}-nginx
+  labels:
+    {{- include "infraforge-ui.labels" . | nindent 4 }}
+data:
+  nginx.conf: |
+    worker_processes {{ .Values.nginx.workerProcesses }};
+    pid /tmp/nginx.pid;
+    error_log /dev/stderr warn;
+
+    events {
+        worker_connections {{ .Values.nginx.workerConnections }};
+    }
+
+    http {
+        include       /etc/nginx/mime.types;
+        default_type  application/octet-stream;
+
+        # Unprivileged temp paths
+        client_body_temp_path /tmp/client_body;
+        proxy_temp_path       /tmp/proxy;
+        fastcgi_temp_path     /tmp/fastcgi;
+        uwsgi_temp_path       /tmp/uwsgi;
+        scgi_temp_path        /tmp/scgi;
+
+        sendfile      on;
+        tcp_nopush    on;
+        tcp_nodelay   on;
+        server_tokens off;
+
+        client_max_body_size {{ .Values.nginx.clientMaxBodySize }};
+
+        log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+                        '$status $body_bytes_sent "$http_referer" '
+                        '"$http_user_agent" rt=$request_time';
+        access_log /dev/stdout main;
+
+        gzip on;
+        gzip_vary on;
+        gzip_min_length 1024;
+        gzip_comp_level 6;
+        gzip_types
+            text/plain
+            text/css
+            text/javascript
+            application/javascript
+            application/json
+            application/xml
+            image/svg+xml;
+
+        server {
+            listen      8080 default_server;
+            listen      [::]:8080 default_server;
+            server_name _;
+            root        /usr/share/nginx/html;
+            index       index.html;
+
+            # -- security headers --
+            add_header X-Content-Type-Options    "nosniff"        always;
+            add_header X-Frame-Options           "DENY"           always;
+            add_header Referrer-Policy           "no-referrer"    always;
+            add_header X-XSS-Protection          "1; mode=block"  always;
+            add_header Permissions-Policy        "geolocation=(), microphone=(), camera=()" always;
+
+            # -- health checks --
+            location = /healthz {
+                access_log off;
+                return 200 "ok\n";
+                add_header Content-Type text/plain;
+            }
+
+            # -- API reverse proxy --
+            location /api/ {
+                proxy_pass          {{ .Values.nginx.apiUpstream }};
+                proxy_http_version  1.1;
+                proxy_set_header    Host              $host;
+                proxy_set_header    X-Real-IP         $remote_addr;
+                proxy_set_header    X-Forwarded-For   $proxy_add_x_forwarded_for;
+                proxy_set_header    X-Forwarded-Proto $scheme;
+                proxy_set_header    X-Request-Id      $request_id;
+                proxy_read_timeout  60s;
+            }
+
+            # -- hashed assets: immutable, long cache --
+            location /assets/ {
+                expires 1y;
+                add_header Cache-Control "public, immutable";
+                try_files $uri =404;
+            }
+
+            # -- index.html: never cached for instant deploys --
+            location = /index.html {
+                add_header Cache-Control "no-store, no-cache, must-revalidate";
+                expires 0;
+            }
+
+            # -- SPA fallback --
+            location / {
+                try_files $uri $uri/ /index.html;
+            }
+
+            # -- block dotfiles --
+            location ~ /\. {
+                deny all;
+                access_log off;
+                log_not_found off;
+            }
+        }
+    }
