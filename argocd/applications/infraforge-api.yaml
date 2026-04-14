@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: infraforge-api
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: infraforge
+    app.kubernetes.io/component: api
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/aybzakaria5/infraforge.git
+    targetRevision: main
+    path: helm/infraforge-api
+    helm:
+      valueFiles:
+        - values.yaml
+        # Override per environment using ArgoCD ApplicationSet or
+        # by swapping this to values-local.yaml / values-aws.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: infraforge
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+    retry:
+      limit: 3
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 3m
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas  # managed by HPA when autoscaling is enabled
