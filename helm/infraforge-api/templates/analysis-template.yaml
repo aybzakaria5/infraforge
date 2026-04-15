@@ -1,0 +1,46 @@
+{{- if and .Values.canary.enabled .Values.canary.analysisTemplate.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: {{ include "infraforge-api.fullname" . }}-success-rate
+  labels:
+    {{- include "infraforge-api.labels" . | nindent 4 }}
+spec:
+  args:
+    - name: service-name
+      value: {{ include "infraforge-api.fullname" . }}-canary
+  metrics:
+    - name: success-rate
+      interval: {{ .Values.canary.analysisTemplate.interval | default "30s" }}
+      successCondition: result[0] >= {{ .Values.canary.analysisTemplate.successThreshold | default 0.95 }}
+      failureLimit: {{ .Values.canary.analysisTemplate.failureLimit | default 3 }}
+      provider:
+        prometheus:
+          address: {{ .Values.canary.analysisTemplate.prometheusAddress | default "http://prometheus-server.monitoring:80" }}
+          query: |
+            sum(rate(http_requests_total{service="{{`{{args.service-name}}`}}", status=~"2.."}[2m]))
+            /
+            sum(rate(http_requests_total{service="{{`{{args.service-name}}`}}"}[2m]))
+    - name: error-rate
+      interval: {{ .Values.canary.analysisTemplate.interval | default "30s" }}
+      successCondition: result[0] <= {{ .Values.canary.analysisTemplate.errorThreshold | default 0.05 }}
+      failureLimit: {{ .Values.canary.analysisTemplate.failureLimit | default 3 }}
+      provider:
+        prometheus:
+          address: {{ .Values.canary.analysisTemplate.prometheusAddress | default "http://prometheus-server.monitoring:80" }}
+          query: |
+            sum(rate(http_requests_total{service="{{`{{args.service-name}}`}}", status=~"5.."}[2m]))
+            /
+            sum(rate(http_requests_total{service="{{`{{args.service-name}}`}}"}[2m]))
+    - name: latency-p99
+      interval: {{ .Values.canary.analysisTemplate.interval | default "30s" }}
+      successCondition: result[0] <= {{ .Values.canary.analysisTemplate.latencyThreshold | default 0.5 }}
+      failureLimit: {{ .Values.canary.analysisTemplate.failureLimit | default 3 }}
+      provider:
+        prometheus:
+          address: {{ .Values.canary.analysisTemplate.prometheusAddress | default "http://prometheus-server.monitoring:80" }}
+          query: |
+            histogram_quantile(0.99,
+              sum(rate(http_request_duration_seconds_bucket{service="{{`{{args.service-name}}`}}"}[2m])) by (le)
+            )
+{{- end }}

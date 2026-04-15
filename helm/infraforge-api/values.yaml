@@ -80,6 +80,36 @@ env: {}
   # DATABASE_URL: "postgres://..."
   # AWS_REGION: "us-east-1"
 
+canary:
+  enabled: false
+  maxSurge: "25%"
+  maxUnavailable: 0
+  trafficRouting:
+    enabled: false
+  steps:
+    - setWeight: 10
+    - pause: { duration: 30s }
+    - setWeight: 25
+    - pause: { duration: 30s }
+    - setWeight: 50
+    - pause: { duration: 30s }
+    - setWeight: 75
+    - pause: { duration: 30s }
+  analysis:
+    templates:
+      - templateName: infraforge-api-success-rate
+    startingStep: 2
+    args:
+      - name: service-name
+  analysisTemplate:
+    enabled: false
+    interval: "30s"
+    successThreshold: 0.95
+    errorThreshold: 0.05
+    latencyThreshold: 0.5
+    failureLimit: 3
+    prometheusAddress: "http://prometheus-server.monitoring:80"
+
 livenessProbe:
   httpGet:
     path: /healthz
