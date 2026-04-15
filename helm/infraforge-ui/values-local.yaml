@@ -1,0 +1,32 @@
+# Local dev overrides (k3d)
+replicaCount: 1
+
+image:
+  repository: localhost:5050/infraforge-ui
+  tag: "dev"
+  pullPolicy: Always
+
+ingress:
+  enabled: true
+  className: traefik
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+  hosts:
+    - host: infraforge.local
+      paths:
+        - path: /
+          pathType: Prefix
+
+resources:
+  requests:
+    cpu: 25m
+    memory: 32Mi
+  limits:
+    cpu: 100m
+    memory: 64Mi
+
+autoscaling:
+  enabled: false
+
+nginx:
+  apiUpstream: "http://infraforge-api:8080"

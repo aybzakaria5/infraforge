@@ -1,0 +1,129 @@
+replicaCount: 2
+
+image:
+  repository: infraforge-api
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8080"
+    prometheus.io/path: "/metrics"
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+  runAsGroup: 65532
+  fsGroup: 65532
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: api.infraforge.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 75
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+config:
+  logLevel: "info"
+  logFormat: "json"
+  serverPort: "8080"
+  serverReadTimeout: "10s"
+  serverWriteTimeout: "15s"
+  serverShutdownTimeout: "30s"
+  migrationsPath: "/migrations"
+
+env: {}
+  # DATABASE_URL: "postgres://..."
+  # AWS_REGION: "us-east-1"
+
+canary:
+  enabled: false
+  maxSurge: "25%"
+  maxUnavailable: 0
+  trafficRouting:
+    enabled: false
+  steps:
+    - setWeight: 10
+    - pause: { duration: 30s }
+    - setWeight: 25
+    - pause: { duration: 30s }
+    - setWeight: 50
+    - pause: { duration: 30s }
+    - setWeight: 75
+    - pause: { duration: 30s }
+  analysis:
+    templates:
+      - templateName: infraforge-api-success-rate
+    startingStep: 2
+    args:
+      - name: service-name
+  analysisTemplate:
+    enabled: false
+    interval: "30s"
+    successThreshold: 0.95
+    errorThreshold: 0.05
+    latencyThreshold: 0.5
+    failureLimit: 3
+    prometheusAddress: "http://prometheus-server.monitoring:80"
+
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 15
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /readyz
+    port: http
+  initialDelaySeconds: 3
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3

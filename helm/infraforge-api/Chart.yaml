@@ -1,0 +1,12 @@
+apiVersion: v2
+name: infraforge-api
+description: Helm chart for the InfraForge platform REST API
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+maintainers:
+  - name: Ayoub Zakarya
+keywords:
+  - infraforge
+  - api
+  - platform-engineering

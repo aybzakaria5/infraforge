@@ -1,0 +1,13 @@
+apiVersion: v2
+name: infraforge-ui
+description: Helm chart for the InfraForge platform React dashboard
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+maintainers:
+  - name: Ayoub Zakarya
+keywords:
+  - infraforge
+  - ui
+  - dashboard
+  - react

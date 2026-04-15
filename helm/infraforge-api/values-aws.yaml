@@ -1,0 +1,55 @@
+# AWS deployment overrides
+replicaCount: 3
+
+image:
+  repository: ""  # set via CI: <account-id>.dkr.ecr.<region>.amazonaws.com/infraforge-api
+  tag: ""         # set via CI: git SHA
+  pullPolicy: IfNotPresent
+
+serviceAccount:
+  create: true
+  annotations:
+    eks.amazonaws.com/role-arn: ""  # set per environment — IRSA role for S3/SQS/SecretsManager access
+
+ingress:
+  enabled: true
+  className: alb
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    alb.ingress.kubernetes.io/certificate-arn: ""  # set per environment
+    alb.ingress.kubernetes.io/healthcheck-path: /healthz
+  hosts:
+    - host: api.infraforge.dev
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: infraforge-api-tls
+      hosts:
+        - api.infraforge.dev
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 256Mi
+  limits:
+    cpu: "1"
+    memory: 512Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 75
+
+config:
+  logLevel: "info"
+  logFormat: "json"
+
+env:
+  AWS_REGION: "us-east-1"
+  # DATABASE_URL injected via external-secrets operator

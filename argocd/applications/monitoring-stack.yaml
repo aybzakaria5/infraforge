@@ -1,0 +1,58 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: monitoring-stack
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: infraforge
+    app.kubernetes.io/component: observability
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  sources:
+    # -- Prometheus (kube-prometheus-stack) --
+    - repoURL: https://prometheus-community.github.io/helm-charts
+      chart: kube-prometheus-stack
+      targetRevision: 58.*
+      helm:
+        releaseName: prometheus
+        valueFiles:
+          - $values/helm/platform-services/prometheus/values.yaml
+    # -- Grafana --
+    - repoURL: https://grafana.github.io/helm-charts
+      chart: grafana
+      targetRevision: 7.*
+      helm:
+        releaseName: grafana
+        valueFiles:
+          - $values/helm/platform-services/grafana/values.yaml
+    # -- Loki --
+    - repoURL: https://grafana.github.io/helm-charts
+      chart: loki-stack
+      targetRevision: 2.*
+      helm:
+        releaseName: loki
+        valueFiles:
+          - $values/helm/platform-services/loki/values.yaml
+    # -- Values repo reference (used by $values above) --
+    - repoURL: https://github.com/aybzakaria5/infraforge.git
+      targetRevision: main
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true    # CRD-heavy charts need server-side apply
+      - ApplyOutOfSyncOnly=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 15s
+        factor: 2
+        maxDuration: 5m
