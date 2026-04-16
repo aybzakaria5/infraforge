@@ -82,6 +82,7 @@ export const PipelineFlow = memo(function PipelineFlow({ nodes, edges, onNodeCli
         minZoom={0.3}
         maxZoom={2}
         selectionOnDrag={false}
+        onlyRenderVisibleElements
         proOptions={{ hideAttribution: true }}
         defaultEdgeOptions={{ type: 'smoothstep', style: { strokeWidth: 1.5 } }}
       >
