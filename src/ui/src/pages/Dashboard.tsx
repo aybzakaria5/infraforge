@@ -22,11 +22,11 @@ import { activity, type ActivityType } from '../mocks/activity'
 import { formatDuration } from '../lib/time'
 
 const statusStyle: Record<string, string> = {
-  success: 'text-accent-primary bg-accent-primary/10',
-  running: 'text-accent-info bg-accent-info/10',
+  success: 'text-accent-primary bg-accent-primary/10 shadow-[0_0_8px_rgba(34,197,94,0.2)]',
+  running: 'text-accent-info bg-accent-info/10 shadow-[0_0_8px_rgba(59,130,246,0.2)]',
   pending: 'text-accent-info bg-accent-info/10',
-  failed: 'text-accent-danger bg-accent-danger/10',
-  rollback: 'text-accent-warning bg-accent-warning/10',
+  failed: 'text-accent-danger bg-accent-danger/10 shadow-[0_0_8px_rgba(239,68,68,0.2)]',
+  rollback: 'text-accent-warning bg-accent-warning/10 shadow-[0_0_8px_rgba(234,179,8,0.2)]',
 }
 
 const activityIcon: Record<ActivityType, typeof Rocket> = {
@@ -51,8 +51,8 @@ function UsageBar({ label, used, total, unit }: { label: string; used: number; t
           <span className="text-text-tertiary"> / {total}{unit && ` ${unit}`}</span>
         </span>
       </div>
-      <div className="h-1.5 rounded-full bg-bg-tertiary overflow-hidden">
-        <div className={`h-full rounded-full ${color} transition-all duration-300`} style={{ width: `${pct}%` }} />
+      <div className="h-1.5 rounded-full bg-border-default overflow-hidden">
+        <div className={`h-full rounded-full ${color} bar-shimmer transition-all duration-300`} style={{ width: `${pct}%` }} />
       </div>
     </div>
   )
@@ -87,11 +87,11 @@ export default function Dashboard() {
     <div className="flex flex-col gap-3">
       {/* Metric tiles */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
-        <MetricTile label="Environments" value={dashboardMetrics.total_environments} />
-        <MetricTile label="Active Deploys" value={dashboardMetrics.active_deployments} />
-        <MetricTile label="Cluster Health" value={`${dashboardMetrics.cluster_health}%`} />
-        <MetricTile label="Avg Deploy Time" value={formatDuration(dashboardMetrics.avg_deploy_time)} />
-        <MetricTile label="Success Rate" value={`${dashboardMetrics.success_rate}%`} />
+        <MetricTile label="Environments" value={dashboardMetrics.total_environments} accent="var(--color-accent-primary)" />
+        <MetricTile label="Active Deploys" value={dashboardMetrics.active_deployments} accent="var(--color-accent-info)" />
+        <MetricTile label="Cluster Health" value={`${dashboardMetrics.cluster_health}%`} accent="var(--color-accent-primary)" />
+        <MetricTile label="Avg Deploy Time" value={formatDuration(dashboardMetrics.avg_deploy_time)} accent="var(--color-accent-neutral)" />
+        <MetricTile label="Success Rate" value={`${dashboardMetrics.success_rate}%`} accent="var(--color-accent-warning)" />
       </div>
 
       {/* Main content grid */}
@@ -115,7 +115,7 @@ export default function Dashboard() {
             </thead>
             <tbody>
               {recentDeploys.map(d => (
-                <tr key={d.id} className="border-b border-border-default last:border-0 hover:bg-bg-tertiary transition-colors duration-150">
+                <tr key={d.id} className="border-b border-border-default last:border-0 hover:bg-bg-tertiary transition-colors duration-100 cursor-pointer">
                   <td className="px-3 py-1.5">
                     <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-medium ${statusStyle[d.status] || ''}`}>
                       <StatusDot status={d.status} size={5} />
@@ -197,7 +197,7 @@ export default function Dashboard() {
           {activity.slice(0, 10).map(entry => {
             const Icon = activityIcon[entry.type] || GitCommit
             return (
-              <div key={entry.id} className="flex items-start gap-2.5 px-3 py-2 hover:bg-bg-tertiary transition-colors duration-150">
+              <div key={entry.id} className="group flex items-start gap-2.5 px-3 py-2 hover:bg-bg-tertiary transition-colors duration-100 cursor-pointer">
                 <Icon size={14} className="mt-0.5 text-text-tertiary shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-[12px] text-text-secondary truncate">{entry.message}</p>
@@ -206,7 +206,7 @@ export default function Dashboard() {
                     <Timestamp iso={entry.timestamp} className="text-[11px] text-text-tertiary" />
                   </div>
                 </div>
-                <ArrowUpRight size={12} className="text-text-tertiary shrink-0 mt-0.5" />
+                <ArrowUpRight size={12} className="text-text-tertiary shrink-0 mt-0.5 transition-transform duration-150 group-hover:translate-x-0.5" />
               </div>
             )
           })}
