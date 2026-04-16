@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Handle, Position, type NodeProps } from '@xyflow/react'
 
 export interface MicroserviceNodeData {
@@ -8,32 +9,34 @@ export interface MicroserviceNodeData {
 }
 
 const healthColor: Record<string, string> = {
-  healthy: '#22c55e',
-  degraded: '#eab308',
-  down: '#ef4444',
+  healthy: 'var(--color-accent-primary)',
+  degraded: 'var(--color-accent-warning)',
+  down: 'var(--color-accent-danger)',
 }
 
-export function MicroserviceNode({ data }: NodeProps) {
+const handleClass = '!w-1.5 !h-1.5 !bg-border-hover !border-0'
+
+export const MicroserviceNode = memo(function MicroserviceNode({ data }: NodeProps) {
   const d = data as MicroserviceNodeData
   const dotColor = healthColor[d.health] || healthColor.healthy
 
   return (
     <div
-      className="px-3 py-2 rounded-md border border-border-default bg-bg-tertiary
-        hover:border-border-hover transition-colors duration-150"
-      style={{ minWidth: 140 }}
+      className="px-2.5 py-1.5 rounded-[6px] border border-border-default bg-bg-tertiary
+        transition-all duration-150"
+      style={{ width: 152 }}
     >
-      <Handle type="target" position={Position.Left} className="!w-1.5 !h-1.5 !bg-border-hover !border-0" />
-      <Handle type="source" position={Position.Right} className="!w-1.5 !h-1.5 !bg-border-hover !border-0" />
+      <Handle type="target" position={Position.Left} className={handleClass} />
+      <Handle type="source" position={Position.Right} className={handleClass} />
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5">
         <span
-          className="inline-block w-[6px] h-[6px] rounded-full shrink-0"
+          className="inline-block w-1.5 h-1.5 rounded-full shrink-0"
           style={{ backgroundColor: dotColor }}
         />
-        <span className="text-[12px] font-mono text-text-primary leading-tight">{d.label}</span>
+        <span className="text-[11px] font-mono text-text-primary leading-tight truncate">{d.label}</span>
       </div>
-      <div className="mt-1 text-[10px] font-mono text-text-tertiary">{d.reqRate}</div>
+      <div className="mt-0.5 text-[9px] font-mono text-text-tertiary pl-3">{d.reqRate}</div>
     </div>
   )
-}
+})

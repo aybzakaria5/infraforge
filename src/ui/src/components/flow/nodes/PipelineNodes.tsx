@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Handle, Position, type NodeProps } from '@xyflow/react'
 import {
   GitCommit,
@@ -27,11 +28,11 @@ function formatDur(sec: number): string {
   return `${Math.floor(sec / 60)}m ${Math.round(sec % 60)}s`
 }
 
-const borderColor: Record<string, string> = {
-  success: 'border-accent-primary/40',
-  running: 'border-accent-info',
-  failed: 'border-accent-danger',
-  pending: 'border-border-default',
+const leftBorderColor: Record<string, string> = {
+  success: 'var(--color-accent-primary)',
+  running: 'var(--color-accent-info)',
+  failed: 'var(--color-accent-danger)',
+  pending: 'var(--color-border-default)',
 }
 
 const statusIcon: Record<string, typeof CheckCircle2> = {
@@ -48,6 +49,8 @@ const statusIconColor: Record<string, string> = {
   pending: 'text-text-tertiary',
 }
 
+const handleClass = '!w-1.5 !h-1.5 !bg-border-hover !border-0'
+
 function NodeShell({
   data,
   icon: Icon,
@@ -58,60 +61,60 @@ function NodeShell({
   children: React.ReactNode
 }) {
   const StatusIcon = statusIcon[data.status] || Clock
-  const border = borderColor[data.status] || borderColor.pending
-  const pulseRing = data.status === 'running' ? 'shadow-[0_0_0_2px_rgba(59,130,246,0.25)]' : ''
+  const borderLeft = leftBorderColor[data.status] || leftBorderColor.pending
+  const failedShadow = data.status === 'failed' ? 'shadow-[0_0_8px_rgba(239,68,68,0.15)]' : ''
 
   return (
     <div
-      className={`relative w-[180px] rounded-md border bg-bg-tertiary px-3 py-2
-        hover:border-border-hover transition-colors duration-150 cursor-pointer ${border} ${pulseRing}`}
+      className={`relative w-[170px] rounded-[6px] border border-border-default bg-bg-tertiary
+        pl-0 pr-2.5 py-1.5 transition-all duration-150 cursor-pointer ${failedShadow}`}
+      style={{ borderLeftWidth: 2, borderLeftColor: borderLeft }}
     >
-      <Handle type="target" position={Position.Left} className="!w-1.5 !h-1.5 !bg-border-hover !border-0" />
-      <Handle type="source" position={Position.Right} className="!w-1.5 !h-1.5 !bg-border-hover !border-0" />
+      <Handle type="target" position={Position.Left} className={handleClass} />
+      <Handle type="source" position={Position.Right} className={handleClass} />
 
       {/* Header */}
-      <div className="flex items-center justify-between mb-1.5">
-        <div className="flex items-center gap-1.5">
-          <Icon size={12} className="text-text-tertiary" />
-          <span className="text-[11px] font-medium text-text-secondary uppercase tracking-wide">{data.label}</span>
+      <div className="flex items-center justify-between mb-1 pl-2">
+        <div className="flex items-center gap-1">
+          <Icon size={10} className="text-text-tertiary" />
+          <span className="text-[9px] font-medium text-text-tertiary uppercase tracking-wide">{data.label}</span>
         </div>
-        <StatusIcon size={12} className={statusIconColor[data.status]} />
+        <StatusIcon size={10} className={statusIconColor[data.status]} />
       </div>
 
       {/* Content */}
-      {children}
+      <div className="pl-2">{children}</div>
 
       {/* Duration footer */}
-      <div className="mt-1.5 pt-1 border-t border-border-default flex items-center gap-1 text-[10px] text-text-tertiary">
-        <Clock size={9} />
+      <div className="mt-1 pt-1 pl-2 border-t border-border-default flex items-center gap-1 text-[9px] text-text-tertiary">
+        <Clock size={8} />
         <span className="font-mono">{formatDur(data.duration_sec)}</span>
       </div>
     </div>
   )
 }
 
-export function GitNode({ data }: NodeProps) {
+export const GitNode = memo(function GitNode({ data }: NodeProps) {
   const d = data as unknown as GitNodeData
   return (
     <NodeShell data={d} icon={GitCommit}>
-      <div className="font-mono text-[12px] text-accent-info">{d.commit_sha}</div>
-      <div className="text-[10px] text-text-tertiary truncate mt-0.5">{d.message}</div>
-      <div className="text-[10px] text-text-tertiary mt-0.5">{d.author}</div>
+      <div className="font-mono text-[11px] text-accent-info leading-tight">{d.commit_sha}</div>
+      <div className="text-[9px] text-text-tertiary truncate mt-0.5">{d.message}</div>
     </NodeShell>
   )
-}
+})
 
-export function BuildNode({ data }: NodeProps) {
+export const BuildNode = memo(function BuildNode({ data }: NodeProps) {
   const d = data as unknown as BuildNodeData
   return (
     <NodeShell data={d} icon={Hammer}>
-      <div className="text-[11px] text-text-secondary">Image built</div>
-      <div className="font-mono text-[11px] text-text-tertiary mt-0.5">{d.image_size}</div>
+      <div className="text-[10px] text-text-secondary leading-tight">Image built</div>
+      <div className="font-mono text-[10px] text-text-tertiary mt-0.5">{d.image_size}</div>
     </NodeShell>
   )
-}
+})
 
-export function ScanNode({ data }: NodeProps) {
+export const ScanNode = memo(function ScanNode({ data }: NodeProps) {
   const d = data as unknown as ScanNodeData
   const total = d.critical + d.high + d.medium
   const badgeColor = d.critical > 0
@@ -122,12 +125,10 @@ export function ScanNode({ data }: NodeProps) {
 
   return (
     <NodeShell data={d} icon={ShieldCheck}>
-      <div className="flex items-center gap-1.5">
-        <span className={`inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium ${badgeColor}`}>
-          {total} issue{total !== 1 ? 's' : ''}
-        </span>
-      </div>
-      <div className="flex gap-2 mt-1 text-[10px] font-mono">
+      <span className={`inline-flex px-1 py-0.5 rounded text-[9px] font-medium ${badgeColor}`}>
+        {total} issue{total !== 1 ? 's' : ''}
+      </span>
+      <div className="flex gap-1.5 mt-0.5 text-[9px] font-mono">
         {d.critical > 0 && <span className="text-accent-danger">C:{d.critical}</span>}
         {d.high > 0 && <span className="text-accent-warning">H:{d.high}</span>}
         {d.medium > 0 && <span className="text-text-tertiary">M:{d.medium}</span>}
@@ -135,33 +136,31 @@ export function ScanNode({ data }: NodeProps) {
       </div>
     </NodeShell>
   )
-}
+})
 
-export function PushNode({ data }: NodeProps) {
+export const PushNode = memo(function PushNode({ data }: NodeProps) {
   const d = data as unknown as PushNodeData
   return (
     <NodeShell data={d} icon={Upload}>
-      <div className="font-mono text-[11px] text-text-primary truncate">{d.image_tag}</div>
-      <div className="font-mono text-[10px] text-text-tertiary truncate mt-0.5">
-        {d.registry.length > 30 ? d.registry.slice(0, 28) + '...' : d.registry}
+      <div className="font-mono text-[10px] text-text-primary truncate leading-tight">{d.image_tag}</div>
+      <div className="font-mono text-[9px] text-text-tertiary truncate mt-0.5">
+        {d.registry.length > 28 ? d.registry.slice(0, 26) + '...' : d.registry}
       </div>
     </NodeShell>
   )
-}
+})
 
-export function DeployNode({ data }: NodeProps) {
+export const DeployNode = memo(function DeployNode({ data }: NodeProps) {
   const d = data as unknown as DeployNodeData
   return (
     <NodeShell data={d} icon={Rocket}>
-      <div className="font-mono text-[11px] text-text-primary">{d.environment}</div>
-      <div className="flex items-center gap-1 mt-0.5">
-        <span className="text-[10px] text-text-tertiary">{d.strategy}</span>
-      </div>
+      <div className="font-mono text-[10px] text-text-primary leading-tight">{d.environment}</div>
+      <span className="text-[9px] text-text-tertiary">{d.strategy}</span>
     </NodeShell>
   )
-}
+})
 
-export function VerifyNode({ data }: NodeProps) {
+export const VerifyNode = memo(function VerifyNode({ data }: NodeProps) {
   const d = data as unknown as VerifyNodeData
   const healthColor = d.health_status === 'pass'
     ? 'text-accent-primary'
@@ -171,13 +170,12 @@ export function VerifyNode({ data }: NodeProps) {
 
   return (
     <NodeShell data={d} icon={HeartPulse}>
-      <div className={`text-[11px] font-medium ${healthColor}`}>
+      <div className={`text-[10px] font-medium ${healthColor}`}>
         {d.health_status === 'pass' ? 'Healthy' : d.health_status === 'fail' ? 'Failed' : 'Pending'}
       </div>
       {d.response_time_ms > 0 && (
-        <div className="font-mono text-[10px] text-text-tertiary mt-0.5">{d.response_time_ms}ms</div>
+        <div className="font-mono text-[9px] text-text-tertiary mt-0.5">{d.response_time_ms}ms</div>
       )}
-      <div className="font-mono text-[10px] text-text-tertiary truncate mt-0.5">{d.endpoint}</div>
     </NodeShell>
   )
-}
+})
