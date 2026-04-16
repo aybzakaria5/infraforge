@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import {
   ReactFlow,
   Background,
@@ -166,6 +166,12 @@ function CostSummary() {
 
 export default function Infrastructure() {
   const [selectedNode, setSelectedNode] = useState<Node<InfraNodeData> | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const t = setTimeout(() => setLoading(false), 400)
+    return () => clearTimeout(t)
+  }, [])
 
   const handleNodeClick: NodeMouseHandler = useCallback((_, node) => {
     setSelectedNode(node as Node<InfraNodeData>)
@@ -189,8 +195,12 @@ export default function Infrastructure() {
         <span className="text-[11px] text-text-tertiary">Click a resource to inspect</span>
       </div>
 
-      <div className="flex-1 min-h-0 rounded-md border border-border-default overflow-hidden relative">
-        <ReactFlow
+      <div className="flex-1 min-h-[400px] lg:min-h-0 rounded-md border border-border-default overflow-hidden relative">
+        {loading ? (
+          <div className="w-full h-full flex items-center justify-center bg-bg-primary">
+            <span className="text-[12px] text-text-tertiary animate-pulse">Loading topology...</span>
+          </div>
+        ) : <ReactFlow
           nodes={topologyNodes}
           edges={topologyEdges}
           nodeTypes={nodeTypes}
@@ -218,9 +228,9 @@ export default function Infrastructure() {
               [&>button]:!bg-bg-tertiary [&>button]:!border-border-default [&>button]:!text-text-tertiary
               [&>button:hover]:!bg-bg-input [&>button:hover]:!text-text-secondary"
           />
-        </ReactFlow>
+        </ReactFlow>}
 
-        <CostSummary />
+        {!loading && <CostSummary />}
       </div>
 
       {selectedNode && (

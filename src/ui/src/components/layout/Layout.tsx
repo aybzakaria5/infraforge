@@ -12,7 +12,7 @@ export function Layout() {
       <Sidebar />
 
       {/* Main content — offset by collapsed sidebar width */}
-      <div className="flex-1 ml-12">
+      <div className="flex-1 ml-12 flex flex-col min-h-screen">
         {/* Header bar */}
         <header className="sticky top-0 z-30 flex items-center justify-between h-10 px-4
           border-b border-border-default bg-bg-primary/80 backdrop-blur-sm">
@@ -21,7 +21,7 @@ export function Layout() {
         </header>
 
         {/* Page content */}
-        <main className="p-4">
+        <main className="p-4 flex-1 flex flex-col min-h-0">
           <Outlet />
         </main>
       </div>

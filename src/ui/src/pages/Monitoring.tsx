@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import {
   ResponsiveContainer,
   LineChart,
@@ -13,6 +13,8 @@ import {
 } from 'recharts'
 import { AlertTriangle, Bell, CheckCircle2, XCircle } from 'lucide-react'
 import { StatusDot } from '../components/shared/StatusDot'
+import { Timestamp } from '../components/shared/Timestamp'
+import { ChartSkeleton, TableSkeleton } from '../components/shared/Skeleton'
 import {
   latencyData,
   errorRateData,
@@ -221,16 +223,7 @@ const statusMap: Record<string, { icon: typeof CheckCircle2; color: string }> = 
   inactive: { icon: CheckCircle2, color: 'text-text-tertiary' },
 }
 
-function relativeShort(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime()
-  const m = Math.floor(diff / 60000)
-  if (m < 60) return `${m}m ago`
-  const h = Math.floor(m / 60)
-  if (h < 24) return `${h}h ago`
-  return `${Math.floor(h / 24)}d ago`
-}
-
-function AlertsTable({ rules }: { rules: AlertRule[] }) {
+function AlertsTable({ rules, loading }: { rules: AlertRule[]; loading: boolean }) {
   const sorted = useMemo(() => {
     const order = { firing: 0, pending: 1, inactive: 2 }
     return [...rules].sort((a, b) => order[a.status] - order[b.status])
@@ -275,7 +268,7 @@ function AlertsTable({ rules }: { rules: AlertRule[] }) {
             </tr>
           </thead>
           <tbody>
-            {sorted.map(rule => {
+            {loading ? <TableSkeleton rows={5} cols={5} /> : sorted.map(rule => {
               const st = statusMap[rule.status]
               const StIcon = st.icon
               return (
@@ -298,7 +291,7 @@ function AlertsTable({ rules }: { rules: AlertRule[] }) {
                   <td className="px-3 py-1.5 font-mono text-[12px] text-text-tertiary">{rule.condition}</td>
                   <td className="px-3 py-1.5 text-right text-text-tertiary">
                     {rule.lastFired ? (
-                      <span title={rule.lastFired}>{relativeShort(rule.lastFired)}</span>
+                      <Timestamp iso={rule.lastFired} className="text-text-tertiary" />
                     ) : (
                       <span>—</span>
                     )}
@@ -314,20 +307,38 @@ function AlertsTable({ rules }: { rules: AlertRule[] }) {
 }
 
 export default function Monitoring() {
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const t = setTimeout(() => setLoading(false), 500)
+    return () => clearTimeout(t)
+  }, [])
+
   return (
     <div className="flex flex-col gap-4">
       <span className="text-[13px] text-text-tertiary">Last 24 hours · 1h intervals</span>
 
-      {/* Charts grid: 2×2 */}
-      <div className="grid grid-cols-2 gap-3">
-        <LatencyChart data={latencyData} />
-        <ErrorRateChart data={errorRateData} />
-        <PodCountChart data={podCountData} />
-        <RequestRateChart data={requestRateData} />
+      {/* Charts grid: 2×2 on large, stacked on small */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        {loading ? (
+          <>
+            <ChartSkeleton height={240} />
+            <ChartSkeleton height={240} />
+            <ChartSkeleton height={240} />
+            <ChartSkeleton height={240} />
+          </>
+        ) : (
+          <>
+            <LatencyChart data={latencyData} />
+            <ErrorRateChart data={errorRateData} />
+            <PodCountChart data={podCountData} />
+            <RequestRateChart data={requestRateData} />
+          </>
+        )}
       </div>
 
       {/* Alert rules */}
-      <AlertsTable rules={alertRules} />
+      <AlertsTable rules={alertRules} loading={loading} />
     </div>
   )
 }

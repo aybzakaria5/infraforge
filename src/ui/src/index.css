@@ -119,9 +119,29 @@ body.light {
   background-color: var(--color-bg-tertiary) !important;
 }
 .react-flow__edge-path {
-  stroke: var(--color-rf-edge) !important;
-  stroke-width: 1 !important;
+  stroke-width: 1;
+}
+/* Only apply default edge color when no inline stroke is set */
+.react-flow__edge:not([style]) .react-flow__edge-path {
+  stroke: var(--color-rf-edge);
 }
 .react-flow__selection {
   background-color: var(--color-rf-selection) !important;
+}
+.react-flow__edge-textwrapper .react-flow__edge-text {
+  fill: var(--color-text-tertiary);
+  font-size: 11px;
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+}
+.react-flow__edge-textwrapper rect {
+  fill: var(--color-bg-secondary);
+  stroke: var(--color-border-default);
+  rx: 3;
+}
+.react-flow__handle {
+  opacity: 0;
+  transition: opacity 150ms;
+}
+.react-flow__node:hover .react-flow__handle {
+  opacity: 1;
 }

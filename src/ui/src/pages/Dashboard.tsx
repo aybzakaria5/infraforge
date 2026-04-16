@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import {
   Server,
   Rocket,
@@ -13,10 +14,12 @@ import {
 } from 'lucide-react'
 import { MetricTile } from '../components/shared/MetricTile'
 import { StatusDot } from '../components/shared/StatusDot'
+import { Timestamp } from '../components/shared/Timestamp'
+import { MetricSkeleton, TableSkeleton } from '../components/shared/Skeleton'
 import { dashboardMetrics, clusterMetrics } from '../mocks/metrics'
 import { deployments } from '../mocks/deployments'
 import { activity, type ActivityType } from '../mocks/activity'
-import { relativeTime, formatDuration } from '../lib/time'
+import { formatDuration } from '../lib/time'
 
 const statusStyle: Record<string, string> = {
   success: 'text-accent-primary bg-accent-primary/10',
@@ -57,11 +60,33 @@ function UsageBar({ label, used, total, unit }: { label: string; used: number; t
 
 export default function Dashboard() {
   const recentDeploys = deployments.slice(0, 8)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const t = setTimeout(() => setLoading(false), 600)
+    return () => clearTimeout(t)
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="flex flex-col gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+          {Array.from({ length: 5 }, (_, i) => <MetricSkeleton key={i} />)}
+        </div>
+        <div className="border border-border-default rounded-md bg-bg-secondary overflow-hidden">
+          <div className="px-3 py-2 border-b border-border-default">
+            <div className="h-3 w-32 rounded bg-bg-tertiary animate-pulse" />
+          </div>
+          <table className="w-full"><tbody><TableSkeleton rows={6} cols={6} /></tbody></table>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col gap-3">
       {/* Metric tiles */}
-      <div className="grid grid-cols-5 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
         <MetricTile label="Environments" value={dashboardMetrics.total_environments} />
         <MetricTile label="Active Deploys" value={dashboardMetrics.active_deployments} />
         <MetricTile label="Cluster Health" value={`${dashboardMetrics.cluster_health}%`} />
@@ -70,9 +95,9 @@ export default function Dashboard() {
       </div>
 
       {/* Main content grid */}
-      <div className="grid grid-cols-12 gap-3">
-        {/* Deployments table — 8 cols */}
-        <div className="col-span-8 border border-border-default rounded-md bg-bg-secondary overflow-hidden">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-3">
+        {/* Deployments table */}
+        <div className="xl:col-span-8 border border-border-default rounded-md bg-bg-secondary overflow-hidden">
           <div className="flex items-center justify-between px-3 py-2 border-b border-border-default">
             <span className="text-[13px] font-medium text-text-primary">Recent Deployments</span>
             <span className="text-[11px] text-text-tertiary">{deployments.length} total</span>
@@ -115,9 +140,7 @@ export default function Dashboard() {
                     </span>
                   </td>
                   <td className="px-3 py-1.5 text-right">
-                    <span className="text-text-tertiary" title={d.created_at}>
-                      {relativeTime(d.created_at)}
-                    </span>
+                    <Timestamp iso={d.created_at} className="text-text-tertiary" />
                   </td>
                 </tr>
               ))}
@@ -125,8 +148,8 @@ export default function Dashboard() {
           </table>
         </div>
 
-        {/* Side panel — 4 cols */}
-        <div className="col-span-4 flex flex-col gap-3">
+        {/* Side panel */}
+        <div className="xl:col-span-4 flex flex-col gap-3">
           {/* Cluster resources */}
           <div className="border border-border-default rounded-md bg-bg-secondary p-3 flex flex-col gap-2.5">
             <span className="text-[13px] font-medium text-text-primary">Cluster Resources</span>
@@ -180,9 +203,7 @@ export default function Dashboard() {
                   <p className="text-[12px] text-text-secondary truncate">{entry.message}</p>
                   <div className="flex items-center gap-2 mt-0.5">
                     <span className="text-[11px] text-text-tertiary">{entry.actor}</span>
-                    <span className="text-[11px] text-text-tertiary" title={entry.timestamp}>
-                      {relativeTime(entry.timestamp)}
-                    </span>
+                    <Timestamp iso={entry.timestamp} className="text-[11px] text-text-tertiary" />
                   </div>
                 </div>
                 <ArrowUpRight size={12} className="text-text-tertiary shrink-0 mt-0.5" />

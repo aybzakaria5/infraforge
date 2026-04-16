@@ -1,6 +1,8 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { ChevronLeft, X, Terminal } from 'lucide-react'
 import { StatusDot } from '../components/shared/StatusDot'
+import { Timestamp } from '../components/shared/Timestamp'
+import { TableSkeleton } from '../components/shared/Skeleton'
 import { PipelineFlow } from '../components/flow/PipelineFlow'
 import { deployments, type Deployment } from '../mocks/deployments'
 import {
@@ -223,7 +225,7 @@ function DeploymentDetail({
         {dep.duration_sec > 0 && (
           <span>Duration: <span className="font-mono text-text-secondary">{formatDuration(dep.duration_sec)}</span></span>
         )}
-        <span title={dep.created_at}>{relativeTime(dep.created_at)}</span>
+        <Timestamp iso={dep.created_at} className="text-text-tertiary" />
       </div>
 
       {/* Pipeline */}
@@ -256,6 +258,12 @@ function DeploymentDetail({
 
 export default function Deployments() {
   const [selected, setSelected] = useState<Deployment | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const t = setTimeout(() => setLoading(false), 500)
+    return () => clearTimeout(t)
+  }, [])
 
   if (selected) {
     return <DeploymentDetail dep={selected} onBack={() => setSelected(null)} />
@@ -267,8 +275,8 @@ export default function Deployments() {
         <span className="text-[13px] text-text-tertiary">{deployments.length} deployments</span>
       </div>
 
-      <div className="border border-border-default rounded-md bg-bg-secondary overflow-hidden">
-        <table className="w-full text-[13px]">
+      <div className="border border-border-default rounded-md bg-bg-secondary overflow-x-auto">
+        <table className="w-full text-[13px] min-w-[800px]">
           <thead>
             <tr className="border-b border-border-default text-text-tertiary text-[11px] uppercase tracking-wide">
               <th className="text-left px-3 py-1.5 font-normal">Status</th>
@@ -282,7 +290,7 @@ export default function Deployments() {
             </tr>
           </thead>
           <tbody>
-            {deployments.map(dep => (
+            {loading ? <TableSkeleton rows={6} cols={8} /> : deployments.map(dep => (
               <tr
                 key={dep.id}
                 onClick={() => setSelected(dep)}
@@ -315,8 +323,8 @@ export default function Deployments() {
                 <td className="px-3 py-1.5 text-right font-mono text-text-secondary">
                   {dep.duration_sec > 0 ? formatDuration(dep.duration_sec) : '—'}
                 </td>
-                <td className="px-3 py-1.5 text-right text-text-tertiary" title={dep.created_at}>
-                  {relativeTime(dep.created_at)}
+                <td className="px-3 py-1.5 text-right">
+                  <Timestamp iso={dep.created_at} className="text-text-tertiary" />
                 </td>
               </tr>
             ))}

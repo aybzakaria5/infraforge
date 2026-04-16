@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Key, Users, GitBranch, Bell, Eye, EyeOff, Copy, Trash2, Plus, Check, ExternalLink } from 'lucide-react'
 import { StatusDot } from '../components/shared/StatusDot'
+import { Timestamp } from '../components/shared/Timestamp'
 import { users } from '../mocks/users'
-import { relativeTime } from '../lib/time'
 
 // --- Tabs ---
 const tabs = [
@@ -111,7 +111,7 @@ function ApiKeysPanel() {
                   </div>
                 </td>
                 <td className="px-3 py-1.5 text-right text-text-tertiary">
-                  {k.last_used ? <span title={k.last_used}>{relativeTime(k.last_used)}</span> : '—'}
+                  {k.last_used ? <Timestamp iso={k.last_used} className="text-text-tertiary" /> : '—'}
                 </td>
                 <td className="px-3 py-1.5 text-right">
                   <button className="text-text-tertiary hover:text-accent-danger transition-colors">
@@ -178,10 +178,10 @@ function TeamPanel() {
                   </span>
                 </td>
                 <td className="px-3 py-1.5 text-right text-text-tertiary">
-                  {u.last_login ? <span title={u.last_login}>{relativeTime(u.last_login)}</span> : '—'}
+                  {u.last_login ? <Timestamp iso={u.last_login} className="text-text-tertiary" /> : '—'}
                 </td>
                 <td className="px-3 py-1.5 text-right text-text-tertiary">
-                  <span title={u.created_at}>{relativeTime(u.created_at)}</span>
+                  <Timestamp iso={u.created_at} className="text-text-tertiary" />
                 </td>
               </tr>
             ))}
@@ -264,8 +264,8 @@ function ConnectionsPanel() {
             </div>
             <div className="flex items-center gap-4 text-[11px]">
               {c.lastSync && (
-                <span className="text-text-tertiary" title={c.lastSync}>
-                  Synced {relativeTime(c.lastSync)}
+                <span className="text-text-tertiary flex items-center gap-1">
+                  Synced <Timestamp iso={c.lastSync} />
                 </span>
               )}
               <button className="px-2 py-1 rounded border border-border-default text-[11px] text-text-secondary

@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ChevronRight, Plus, X, Box, Network } from 'lucide-react'
 import { StatusDot } from '../components/shared/StatusDot'
+import { Timestamp } from '../components/shared/Timestamp'
+import { TableSkeleton } from '../components/shared/Skeleton'
 import { ServiceMap } from '../components/flow/ServiceMap'
 import { environments, type Environment } from '../mocks/environments'
 import { userMap } from '../mocks/users'
-import { relativeTime } from '../lib/time'
 
 const tierBadge: Record<string, string> = {
   small: 'text-text-tertiary bg-bg-tertiary',
@@ -179,6 +180,12 @@ function CreatePanel({ open, onClose }: { open: boolean; onClose: () => void }) 
 export default function Environments() {
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [panelOpen, setPanelOpen] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const t = setTimeout(() => setLoading(false), 500)
+    return () => clearTimeout(t)
+  }, [])
 
   const toggle = (id: string) => setExpandedId(prev => (prev === id ? null : id))
 
@@ -202,8 +209,8 @@ export default function Environments() {
       </div>
 
       {/* Table */}
-      <div className="border border-border-default rounded-md bg-bg-secondary overflow-hidden">
-        <table className="w-full text-[13px]">
+      <div className="border border-border-default rounded-md bg-bg-secondary overflow-x-auto">
+        <table className="w-full text-[13px] min-w-[700px]">
           <thead>
             <tr className="border-b border-border-default text-text-tertiary text-[11px] uppercase tracking-wide">
               <th className="w-6 px-2 py-1.5" />
@@ -216,7 +223,7 @@ export default function Environments() {
             </tr>
           </thead>
           <tbody>
-            {environments.map(env => (
+            {loading ? <TableSkeleton rows={6} cols={7} /> : environments.map(env => (
               <>
                 <tr
                   key={env.id}
@@ -253,9 +260,7 @@ export default function Environments() {
                   </td>
                   <td className="px-3 py-1.5 text-right">
                     {env.last_deploy ? (
-                      <span className="text-text-tertiary" title={env.last_deploy}>
-                        {relativeTime(env.last_deploy)}
-                      </span>
+                      <Timestamp iso={env.last_deploy} className="text-text-tertiary" />
                     ) : (
                       <span className="text-text-tertiary">—</span>
                     )}
