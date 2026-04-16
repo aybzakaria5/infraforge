@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { ChevronRight, Plus, X, Clock, Layers, Box } from 'lucide-react'
+import { ChevronRight, Plus, X, Box, Network } from 'lucide-react'
 import { StatusDot } from '../components/shared/StatusDot'
+import { ServiceMap } from '../components/flow/ServiceMap'
 import { environments, type Environment } from '../mocks/environments'
 import { userMap } from '../mocks/users'
 import { relativeTime } from '../lib/time'
@@ -13,11 +14,13 @@ const tierBadge: Record<string, string> = {
 
 function ExpandedRow({ env }: { env: Environment }) {
   const owner = userMap[env.owner_id]
+  const [showMap, setShowMap] = useState(false)
 
   return (
     <tr>
       <td colSpan={7} className="px-0 py-0">
-        <div className="bg-bg-primary border-t border-border-default px-4 py-3">
+        <div className="bg-bg-primary border-t border-border-default px-4 py-3 flex flex-col gap-3">
+          {/* Detail grid */}
           <div className="grid grid-cols-4 gap-4 text-[12px]">
             <div className="flex flex-col gap-1">
               <span className="text-text-tertiary uppercase tracking-wide text-[10px]">Namespace</span>
@@ -38,6 +41,34 @@ function ExpandedRow({ env }: { env: Environment }) {
               <span className="font-mono text-text-tertiary">{env.id}</span>
             </div>
           </div>
+
+          {/* Service topology toggle + graph */}
+          {!showMap ? (
+            <button
+              onClick={(e) => { e.stopPropagation(); setShowMap(true) }}
+              className="flex items-center gap-1.5 text-[12px] text-accent-info hover:text-accent-info/80
+                transition-colors w-fit"
+            >
+              <Network size={13} />
+              View Service Topology
+            </button>
+          ) : (
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] text-text-tertiary uppercase tracking-wide flex items-center gap-1.5">
+                  <Network size={12} />
+                  Service Topology
+                </span>
+                <button
+                  onClick={(e) => { e.stopPropagation(); setShowMap(false) }}
+                  className="text-[11px] text-text-tertiary hover:text-text-secondary transition-colors"
+                >
+                  Hide
+                </button>
+              </div>
+              <ServiceMap envId={env.id} />
+            </div>
+          )}
         </div>
       </td>
     </tr>
