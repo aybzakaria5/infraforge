@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -11,21 +11,28 @@ import (
 
 	"github.com/aybzakarya/infraforge/src/api/internal/config"
 	"github.com/aybzakarya/infraforge/src/api/internal/handlers"
+	"github.com/aybzakarya/infraforge/src/api/internal/middleware"
 	"github.com/aybzakarya/infraforge/src/api/internal/repository"
 	"github.com/aybzakarya/infraforge/src/api/internal/service"
 )
 
 func main() {
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		Level: slog.LevelInfo,
+	}))
+
 	cfg, err := config.Load()
 	if err != nil {
-		log.Fatalf("failed to load config: %v", err)
+		logger.Error("failed to load config", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
 
 	// database
 	ctx := context.Background()
 	pool, err := repository.NewPool(ctx, cfg.Database.DSN())
 	if err != nil {
-		log.Fatalf("failed to connect to database: %v", err)
+		logger.Error("failed to connect to database", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
 	defer pool.Close()
 
@@ -44,9 +51,16 @@ func main() {
 
 	router := handlers.NewRouter(healthH, envH, depH)
 
+	// middleware chain: outermost runs first
+	var handler http.Handler = router
+	handler = middleware.Auth(cfg.APIKey)(handler)
+	handler = middleware.Logging(logger)(handler)
+	handler = middleware.CORS(handler)
+	handler = middleware.RequestID(handler)
+
 	srv := &http.Server{
 		Addr:         cfg.Server.Addr(),
-		Handler:      router,
+		Handler:      handler,
 		ReadTimeout:  cfg.Server.ReadTimeout,
 		WriteTimeout: cfg.Server.WriteTimeout,
 		IdleTimeout:  cfg.Server.IdleTimeout,
@@ -55,7 +69,7 @@ func main() {
 	// start server in background
 	errCh := make(chan error, 1)
 	go func() {
-		log.Printf("starting server on %s", srv.Addr)
+		logger.Info("starting server", slog.String("addr", srv.Addr))
 		errCh <- srv.ListenAndServe()
 	}()
 
@@ -65,9 +79,9 @@ func main() {
 
 	select {
 	case sig := <-quit:
-		log.Printf("received signal %s, shutting down", sig)
+		logger.Info("received signal, shutting down", slog.String("signal", sig.String()))
 	case err := <-errCh:
-		log.Printf("server error: %v", err)
+		logger.Error("server error", slog.String("error", err.Error()))
 	}
 
 	// graceful shutdown with 10s deadline
@@ -75,8 +89,9 @@ func main() {
 	defer cancel()
 
 	if err := srv.Shutdown(shutdownCtx); err != nil {
-		log.Fatalf("forced shutdown: %v", err)
+		logger.Error("forced shutdown", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
 
-	log.Println("server stopped")
+	logger.Info("server stopped")
 }

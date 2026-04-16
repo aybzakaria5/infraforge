@@ -10,6 +10,7 @@ import (
 type Config struct {
 	Server   ServerConfig
 	Database DatabaseConfig
+	APIKey   string
 }
 
 type ServerConfig struct {
@@ -48,6 +49,7 @@ func Load() (*Config, error) {
 	}
 
 	cfg := &Config{
+		APIKey: getEnv("API_KEY", ""),
 		Server: ServerConfig{
 			Host:         getEnv("SERVER_HOST", "0.0.0.0"),
 			Port:         serverPort,
