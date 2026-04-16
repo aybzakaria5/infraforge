@@ -190,12 +190,33 @@ body {
   stroke: var(--color-border-default);
   rx: 3;
 }
+/* --- Node interaction states --- */
 .react-flow__handle {
   opacity: 0;
   transition: opacity 150ms;
 }
 .react-flow__node:hover .react-flow__handle {
   opacity: 1;
+}
+.react-flow__node:hover > div {
+  border-color: var(--color-rf-node-border-hover) !important;
+  box-shadow: 0 0 0 1px rgba(99,102,241,0.2), 0 2px 8px rgba(0,0,0,0.3);
+}
+.react-flow__node.selected > div {
+  border-color: var(--color-rf-node-border-selected) !important;
+  box-shadow: 0 0 0 1px rgba(99,102,241,0.4), 0 4px 12px rgba(0,0,0,0.4);
+  transform: scale(1.02);
+}
+.react-flow__node.dragging > div {
+  opacity: 0.85;
+  cursor: grabbing;
+}
+/* --- Edge interaction states --- */
+.react-flow__edge-path {
+  transition: stroke-width 100ms;
+}
+.react-flow__edge:hover .react-flow__edge-path {
+  stroke-width: 2.5 !important;
 }
 
 /* --- Shimmer animation for progress bars --- */
