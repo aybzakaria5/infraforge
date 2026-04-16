@@ -224,20 +224,15 @@ export default function Infrastructure() {
             style: { strokeWidth: 1.5 },
           }}
         >
-          <Background variant={BackgroundVariant.Dots} gap={20} size={1} className="!bg-bg-primary" />
+          <Background variant={BackgroundVariant.Dots} gap={16} size={1} />
           <MiniMap
             nodeColor={miniMapNodeColor}
-            maskColor="rgba(0,0,0,0.6)"
-            className="!bg-bg-secondary !border-border-default"
+            maskColor="var(--color-bg-primary)"
+            style={{ opacity: 0.6 }}
             pannable
             zoomable
           />
-          <Controls
-            showInteractive={false}
-            className="!bg-bg-tertiary !border-border-default !shadow-none
-              [&>button]:!bg-bg-tertiary [&>button]:!border-border-default [&>button]:!text-text-tertiary
-              [&>button:hover]:!bg-bg-input [&>button:hover]:!text-text-secondary"
-          />
+          <Controls showInteractive={false} />
         </ReactFlow>}
 
         {!loading && <CostSummary />}

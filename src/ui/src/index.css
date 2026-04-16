@@ -153,17 +153,27 @@ body {
 .react-flow__background {
   background-color: var(--color-rf-bg) !important;
 }
+.react-flow__background pattern circle {
+  fill: var(--color-rf-dots) !important;
+}
 .react-flow__minimap {
   background-color: var(--color-rf-minimap-bg) !important;
   border: 1px solid var(--color-rf-controls-border) !important;
   border-radius: 6px;
 }
+.react-flow__minimap-mask {
+  fill: var(--color-rf-bg) !important;
+  fill-opacity: 0.6 !important;
+}
 .react-flow__controls {
   background-color: var(--color-rf-controls-bg) !important;
   border: 1px solid var(--color-rf-controls-border) !important;
   border-radius: 6px;
+  overflow: hidden;
 }
 .react-flow__controls-button {
+  width: 28px !important;
+  height: 28px !important;
   background-color: var(--color-rf-controls-bg) !important;
   border-color: var(--color-rf-controls-border) !important;
   fill: var(--color-text-secondary) !important;
