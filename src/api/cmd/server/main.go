@@ -10,6 +10,9 @@ import (
 	"time"
 
 	"github.com/aybzakarya/infraforge/src/api/internal/config"
+	"github.com/aybzakarya/infraforge/src/api/internal/handlers"
+	"github.com/aybzakarya/infraforge/src/api/internal/repository"
+	"github.com/aybzakarya/infraforge/src/api/internal/service"
 )
 
 func main() {
@@ -18,29 +21,45 @@ func main() {
 		log.Fatalf("failed to load config: %v", err)
 	}
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"status":"ok"}`))
-	})
+	// database
+	ctx := context.Background()
+	pool, err := repository.NewPool(ctx, cfg.Database.DSN())
+	if err != nil {
+		log.Fatalf("failed to connect to database: %v", err)
+	}
+	defer pool.Close()
+
+	// repos
+	envRepo := repository.NewEnvironmentRepo(pool)
+	depRepo := repository.NewDeploymentRepo(pool)
+
+	// services
+	envSvc := service.NewEnvironmentService(envRepo)
+	depSvc := service.NewDeploymentService(depRepo, envRepo)
+
+	// handlers
+	healthH := handlers.NewHealthHandler(pool)
+	envH := handlers.NewEnvironmentHandler(envSvc)
+	depH := handlers.NewDeploymentHandler(depSvc)
+
+	router := handlers.NewRouter(healthH, envH, depH)
 
 	srv := &http.Server{
 		Addr:         cfg.Server.Addr(),
-		Handler:      mux,
+		Handler:      router,
 		ReadTimeout:  cfg.Server.ReadTimeout,
 		WriteTimeout: cfg.Server.WriteTimeout,
 		IdleTimeout:  cfg.Server.IdleTimeout,
 	}
 
-	// Start server in background
+	// start server in background
 	errCh := make(chan error, 1)
 	go func() {
 		log.Printf("starting server on %s", srv.Addr)
 		errCh <- srv.ListenAndServe()
 	}()
 
-	// Wait for interrupt or server error
+	// wait for interrupt or server error
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 
@@ -51,11 +70,11 @@ func main() {
 		log.Printf("server error: %v", err)
 	}
 
-	// Graceful shutdown with 10s deadline
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	// graceful shutdown with 10s deadline
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	if err := srv.Shutdown(ctx); err != nil {
+	if err := srv.Shutdown(shutdownCtx); err != nil {
 		log.Fatalf("forced shutdown: %v", err)
 	}
 
