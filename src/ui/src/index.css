@@ -1,0 +1,147 @@
+@import "tailwindcss";
+
+@theme {
+  /* --- Typography --- */
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
+
+  /* --- Dark palette (default) --- */
+  --color-bg-primary: #0a0a0b;
+  --color-bg-secondary: #111113;
+  --color-bg-tertiary: #18181b;
+  --color-bg-input: #1c1c1f;
+
+  --color-border-default: #27272a;
+  --color-border-hover: #3f3f46;
+
+  --color-text-primary: #e4e4e7;
+  --color-text-secondary: #a1a1aa;
+  --color-text-tertiary: #71717a;
+
+  --color-accent-primary: #22c55e;
+  --color-accent-warning: #eab308;
+  --color-accent-danger: #ef4444;
+  --color-accent-info: #3b82f6;
+  --color-accent-neutral: #6366f1;
+
+  /* --- Light palette --- */
+  --color-light-bg-primary: #fafaf9;
+  --color-light-bg-secondary: #f5f5f4;
+  --color-light-bg-tertiary: #e7e5e4;
+  --color-light-bg-input: #ffffff;
+
+  --color-light-border-default: #d6d3d1;
+  --color-light-border-hover: #a8a29e;
+
+  --color-light-text-primary: #1c1917;
+  --color-light-text-secondary: #57534e;
+  --color-light-text-tertiary: #78716c;
+
+  /* --- React Flow tokens --- */
+  --color-rf-bg: #0a0a0b;
+  --color-rf-node-bg: #18181b;
+  --color-rf-node-border: #27272a;
+  --color-rf-node-border-hover: #3f3f46;
+  --color-rf-node-border-selected: #6366f1;
+  --color-rf-edge: #3f3f46;
+  --color-rf-edge-animated: #22c55e;
+  --color-rf-edge-failed: #ef4444;
+  --color-rf-minimap-bg: #111113;
+  --color-rf-controls-bg: #18181b;
+  --color-rf-controls-border: #27272a;
+  --color-rf-dots: #1c1c1f;
+  --color-rf-selection: rgba(99, 102, 241, 0.15);
+}
+
+/* --- Google Fonts import --- */
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap");
+
+/* --- Base styles --- */
+html {
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* --- Light theme override --- */
+body.light {
+  background-color: var(--color-light-bg-primary);
+  color: var(--color-light-text-primary);
+}
+
+/* --- Scrollbar --- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-hover);
+  border-radius: 3px;
+}
+
+/* --- React Flow dark overrides --- */
+.react-flow {
+  background-color: var(--color-rf-bg) !important;
+}
+.react-flow__background {
+  background-color: var(--color-rf-bg) !important;
+}
+.react-flow__minimap {
+  background-color: var(--color-rf-minimap-bg) !important;
+  border: 1px solid var(--color-rf-controls-border) !important;
+  border-radius: 6px;
+}
+.react-flow__controls {
+  background-color: var(--color-rf-controls-bg) !important;
+  border: 1px solid var(--color-rf-controls-border) !important;
+  border-radius: 6px;
+}
+.react-flow__controls-button {
+  background-color: var(--color-rf-controls-bg) !important;
+  border-color: var(--color-rf-controls-border) !important;
+  fill: var(--color-text-secondary) !important;
+}
+.react-flow__controls-button:hover {
+  background-color: var(--color-bg-tertiary) !important;
+}
+.react-flow__edge-path {
+  stroke-width: 1;
+}
+/* Only apply default edge color when no inline stroke is set */
+.react-flow__edge:not([style]) .react-flow__edge-path {
+  stroke: var(--color-rf-edge);
+}
+.react-flow__selection {
+  background-color: var(--color-rf-selection) !important;
+}
+.react-flow__edge-textwrapper .react-flow__edge-text {
+  fill: var(--color-text-tertiary);
+  font-size: 11px;
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+}
+.react-flow__edge-textwrapper rect {
+  fill: var(--color-bg-secondary);
+  stroke: var(--color-border-default);
+  rx: 3;
+}
+.react-flow__handle {
+  opacity: 0;
+  transition: opacity 150ms;
+}
+.react-flow__node:hover .react-flow__handle {
+  opacity: 1;
+}
