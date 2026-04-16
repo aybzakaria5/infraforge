@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from 'react'
+import { useMemo, useCallback, memo } from 'react'
 import {
   ReactFlow,
   Background,
@@ -28,13 +28,13 @@ const nodeTypes: NodeTypes = {
   verifyNode: VerifyNode,
 }
 
-const NODE_WIDTH = 180
-const NODE_HEIGHT = 100
+const NODE_WIDTH = 170
+const NODE_HEIGHT = 80
 
 function layoutPipeline(nodes: Node[], edges: Edge[]): Node[] {
   const g = new dagre.graphlib.Graph()
   g.setDefaultEdgeLabel(() => ({}))
-  g.setGraph({ rankdir: 'LR', nodesep: 40, ranksep: 60 })
+  g.setGraph({ rankdir: 'LR', nodesep: 30, ranksep: 50 })
 
   nodes.forEach(n => g.setNode(n.id, { width: NODE_WIDTH, height: NODE_HEIGHT }))
   edges.forEach(e => g.setEdge(e.source, e.target))
@@ -56,7 +56,7 @@ interface PipelineFlowProps {
   onNodeClick?: (nodeId: string) => void
 }
 
-export function PipelineFlow({ nodes, edges, onNodeClick }: PipelineFlowProps) {
+export const PipelineFlow = memo(function PipelineFlow({ nodes, edges, onNodeClick }: PipelineFlowProps) {
   const layoutNodes = useMemo(() => layoutPipeline(nodes, edges), [nodes, edges])
 
   const handleNodeClick: NodeMouseHandler = useCallback(
@@ -65,26 +65,28 @@ export function PipelineFlow({ nodes, edges, onNodeClick }: PipelineFlowProps) {
   )
 
   return (
-    <div className="h-[220px] w-full rounded-md border border-border-default overflow-hidden">
+    <div className="h-[200px] w-full rounded-[6px] border border-border-default overflow-hidden">
       <ReactFlow
         nodes={layoutNodes}
         edges={edges}
         nodeTypes={nodeTypes}
         onNodeClick={handleNodeClick}
         fitView
-        fitViewOptions={{ padding: 0.15 }}
-        nodesDraggable={false}
+        fitViewOptions={{ padding: 0.2 }}
+        nodesDraggable
         nodesConnectable={false}
-        panOnDrag={false}
-        zoomOnScroll={false}
-        zoomOnPinch={false}
+        panOnDrag
+        zoomOnScroll
+        zoomOnPinch
         zoomOnDoubleClick={false}
-        preventScrolling={false}
+        minZoom={0.3}
+        maxZoom={2}
+        selectionOnDrag={false}
         proOptions={{ hideAttribution: true }}
-        defaultEdgeOptions={{ type: 'smoothstep', style: { strokeWidth: 1 } }}
+        defaultEdgeOptions={{ type: 'smoothstep', style: { strokeWidth: 1.5 } }}
       >
-        <Background variant={BackgroundVariant.Dots} gap={20} size={1} className="!bg-bg-primary" />
+        <Background variant={BackgroundVariant.Dots} gap={16} size={1} />
       </ReactFlow>
     </div>
   )
-}
+})

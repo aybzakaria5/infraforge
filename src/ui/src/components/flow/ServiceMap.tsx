@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { ReactFlow, Background, BackgroundVariant, type NodeTypes } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import { MicroserviceNode } from './nodes/MicroserviceNode'
@@ -16,30 +17,33 @@ interface ServiceMapProps {
   envId: string
 }
 
-export function ServiceMap({ envId }: ServiceMapProps) {
+export const ServiceMap = memo(function ServiceMap({ envId }: ServiceMapProps) {
   const { nodes, edges } = getServiceMap(envId)
 
   return (
-    <div className="h-[280px] w-full rounded-md border border-border-default overflow-hidden bg-rf-bg">
+    <div className="h-[260px] w-full rounded-[6px] border border-border-default overflow-hidden">
       <ReactFlow
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
         defaultEdgeOptions={defaultEdgeOptions}
         fitView
-        fitViewOptions={{ padding: 0.3 }}
+        fitViewOptions={{ padding: 0.25 }}
         nodesDraggable={false}
         nodesConnectable={false}
         elementsSelectable={false}
-        panOnDrag={false}
-        zoomOnScroll={false}
-        zoomOnPinch={false}
+        panOnDrag
+        zoomOnScroll
+        zoomOnPinch
         zoomOnDoubleClick={false}
+        minZoom={0.5}
+        maxZoom={2}
+        selectionOnDrag={false}
         preventScrolling={false}
         proOptions={{ hideAttribution: true }}
       >
-        <Background variant={BackgroundVariant.Dots} gap={20} size={1} className="!bg-bg-primary" />
+        <Background variant={BackgroundVariant.Dots} gap={16} size={1} />
       </ReactFlow>
     </div>
   )
-}
+})

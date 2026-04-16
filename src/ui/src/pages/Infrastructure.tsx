@@ -207,12 +207,21 @@ export default function Infrastructure() {
           nodeTypes={nodeTypes}
           onNodeClick={handleNodeClick}
           fitView
-          fitViewOptions={{ padding: 0.12 }}
+          fitViewOptions={{ padding: 0.2 }}
+          nodesDraggable
           nodesConnectable={false}
+          panOnDrag
+          zoomOnScroll
+          zoomOnPinch
+          zoomOnDoubleClick={false}
+          minZoom={0.3}
+          maxZoom={2}
+          selectionOnDrag={false}
+          onlyRenderVisibleElements
           proOptions={{ hideAttribution: true }}
           defaultEdgeOptions={{
             type: 'smoothstep',
-            style: { strokeWidth: 1 },
+            style: { strokeWidth: 1.5 },
           }}
         >
           <Background variant={BackgroundVariant.Dots} gap={20} size={1} className="!bg-bg-primary" />
