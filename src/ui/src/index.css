@@ -1,11 +1,74 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   /* --- Typography --- */
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
   --font-sans: "IBM Plex Sans", system-ui, sans-serif;
 
-  /* --- Dark palette (default) --- */
+  /* --- Color token names (values set via :root / .dark below) --- */
+  --color-bg-primary: initial;
+  --color-bg-secondary: initial;
+  --color-bg-tertiary: initial;
+  --color-bg-input: initial;
+
+  --color-border-default: initial;
+  --color-border-hover: initial;
+
+  --color-text-primary: initial;
+  --color-text-secondary: initial;
+  --color-text-tertiary: initial;
+
+  --color-accent-primary: #22c55e;
+  --color-accent-warning: #eab308;
+  --color-accent-danger: #ef4444;
+  --color-accent-info: #3b82f6;
+  --color-accent-neutral: #6366f1;
+
+  /* --- React Flow tokens --- */
+  --color-rf-bg: initial;
+  --color-rf-node-bg: initial;
+  --color-rf-node-border: initial;
+  --color-rf-node-border-hover: initial;
+  --color-rf-node-border-selected: #6366f1;
+  --color-rf-edge: initial;
+  --color-rf-edge-animated: #22c55e;
+  --color-rf-edge-failed: #ef4444;
+  --color-rf-minimap-bg: initial;
+  --color-rf-controls-bg: initial;
+  --color-rf-controls-border: initial;
+  --color-rf-dots: initial;
+  --color-rf-selection: rgba(99, 102, 241, 0.15);
+}
+
+/* === Light mode (default :root) === */
+:root {
+  --color-bg-primary: #fafaf9;
+  --color-bg-secondary: #f5f5f4;
+  --color-bg-tertiary: #e7e5e4;
+  --color-bg-input: #ffffff;
+
+  --color-border-default: #d6d3d1;
+  --color-border-hover: #a8a29e;
+
+  --color-text-primary: #1c1917;
+  --color-text-secondary: #57534e;
+  --color-text-tertiary: #78716c;
+
+  --color-rf-bg: #fafaf9;
+  --color-rf-node-bg: #f5f5f4;
+  --color-rf-node-border: #d6d3d1;
+  --color-rf-node-border-hover: #a8a29e;
+  --color-rf-edge: #a8a29e;
+  --color-rf-minimap-bg: #f5f5f4;
+  --color-rf-controls-bg: #f5f5f4;
+  --color-rf-controls-border: #d6d3d1;
+  --color-rf-dots: #e7e5e4;
+}
+
+/* === Dark mode (.dark on <html>) === */
+.dark {
   --color-bg-primary: #0a0a0b;
   --color-bg-secondary: #111113;
   --color-bg-tertiary: #18181b;
@@ -18,43 +81,16 @@
   --color-text-secondary: #a1a1aa;
   --color-text-tertiary: #71717a;
 
-  --color-accent-primary: #22c55e;
-  --color-accent-warning: #eab308;
-  --color-accent-danger: #ef4444;
-  --color-accent-info: #3b82f6;
-  --color-accent-neutral: #6366f1;
-
-  /* --- Light palette --- */
-  --color-light-bg-primary: #fafaf9;
-  --color-light-bg-secondary: #f5f5f4;
-  --color-light-bg-tertiary: #e7e5e4;
-  --color-light-bg-input: #ffffff;
-
-  --color-light-border-default: #d6d3d1;
-  --color-light-border-hover: #a8a29e;
-
-  --color-light-text-primary: #1c1917;
-  --color-light-text-secondary: #57534e;
-  --color-light-text-tertiary: #78716c;
-
-  /* --- React Flow tokens --- */
   --color-rf-bg: #0a0a0b;
   --color-rf-node-bg: #18181b;
   --color-rf-node-border: #27272a;
   --color-rf-node-border-hover: #3f3f46;
-  --color-rf-node-border-selected: #6366f1;
   --color-rf-edge: #3f3f46;
-  --color-rf-edge-animated: #22c55e;
-  --color-rf-edge-failed: #ef4444;
   --color-rf-minimap-bg: #111113;
   --color-rf-controls-bg: #18181b;
   --color-rf-controls-border: #27272a;
   --color-rf-dots: #1c1c1f;
-  --color-rf-selection: rgba(99, 102, 241, 0.15);
 }
-
-/* --- Google Fonts import --- */
-@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap");
 
 /* --- Base styles --- */
 html {
@@ -72,12 +108,6 @@ body {
 
 #root {
   min-height: 100vh;
-}
-
-/* --- Light theme override --- */
-body.light {
-  background-color: var(--color-light-bg-primary);
-  color: var(--color-light-text-primary);
 }
 
 /* --- Scrollbar --- */
