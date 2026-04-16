@@ -46,8 +46,9 @@ function ChartTooltip({ active, payload, label }: TooltipProps<number, string>) 
   )
 }
 
-const gridStroke = '#1c1c1f'
-const axisStyle = { fontSize: 10, fill: '#71717a', fontFamily: 'JetBrains Mono, monospace' }
+// Uses CSS variable value — falls back for Recharts which needs a raw string
+const gridStroke = 'var(--color-border-default)'
+const axisStyle = { fontSize: 10, fill: 'var(--color-text-tertiary)', fontFamily: 'JetBrains Mono, monospace' }
 
 function LatencyChart({ data }: { data: LatencyPoint[] }) {
   return (

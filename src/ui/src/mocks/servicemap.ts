@@ -20,12 +20,12 @@ const serviceMaps: Record<string, ServiceMapDef> = {
     ],
     edges: [
       { id: 'e-in-api', source: 'svc-ingress', target: 'svc-api', type: 'smoothstep', animated: true, style: { stroke: '#22c55e' }, label: '142.8/s' },
-      { id: 'e-in-auth', source: 'svc-ingress', target: 'svc-auth', type: 'smoothstep', style: { stroke: '#3f3f46' }, label: '38.4/s' },
-      { id: 'e-api-worker', source: 'svc-api', target: 'svc-worker', type: 'smoothstep', style: { stroke: '#3f3f46' }, label: '12.1/s' },
-      { id: 'e-api-db', source: 'svc-api', target: 'svc-db', type: 'smoothstep', style: { stroke: '#3f3f46' }, label: '84.2/s' },
-      { id: 'e-auth-db', source: 'svc-auth', target: 'svc-db', type: 'smoothstep', style: { stroke: '#3f3f46' } },
-      { id: 'e-worker-cache', source: 'svc-worker', target: 'svc-cache', type: 'smoothstep', style: { stroke: '#3f3f46' } },
-      { id: 'e-api-cache', source: 'svc-api', target: 'svc-cache', type: 'smoothstep', style: { stroke: '#3f3f46' } },
+      { id: 'e-in-auth', source: 'svc-ingress', target: 'svc-auth', type: 'smoothstep', label: '38.4/s' },
+      { id: 'e-api-worker', source: 'svc-api', target: 'svc-worker', type: 'smoothstep', label: '12.1/s' },
+      { id: 'e-api-db', source: 'svc-api', target: 'svc-db', type: 'smoothstep', label: '84.2/s' },
+      { id: 'e-auth-db', source: 'svc-auth', target: 'svc-db', type: 'smoothstep' },
+      { id: 'e-worker-cache', source: 'svc-worker', target: 'svc-cache', type: 'smoothstep' },
+      { id: 'e-api-cache', source: 'svc-api', target: 'svc-cache', type: 'smoothstep' },
     ],
   },
 
@@ -39,8 +39,8 @@ const serviceMaps: Record<string, ServiceMapDef> = {
     ],
     edges: [
       { id: 'e-in-auth', source: 'svc-ingress', target: 'svc-auth', type: 'smoothstep', animated: true, style: { stroke: '#22c55e' }, label: '8.2/s' },
-      { id: 'e-auth-db', source: 'svc-auth', target: 'svc-db', type: 'smoothstep', style: { stroke: '#3f3f46' }, label: '14.6/s' },
-      { id: 'e-auth-cache', source: 'svc-auth', target: 'svc-cache', type: 'smoothstep', style: { stroke: '#3f3f46' }, label: '22.3/s' },
+      { id: 'e-auth-db', source: 'svc-auth', target: 'svc-db', type: 'smoothstep', label: '14.6/s' },
+      { id: 'e-auth-cache', source: 'svc-auth', target: 'svc-cache', type: 'smoothstep', label: '22.3/s' },
     ],
   },
 
@@ -54,8 +54,8 @@ const serviceMaps: Record<string, ServiceMapDef> = {
     ],
     edges: [
       { id: 'e-api-proc', source: 'svc-api', target: 'svc-processor', type: 'smoothstep', animated: true, style: { stroke: '#22c55e' }, label: '1.8/s' },
-      { id: 'e-api-db', source: 'svc-api', target: 'svc-db', type: 'smoothstep', style: { stroke: '#3f3f46' }, label: '6.4/s' },
-      { id: 'e-proc-queue', source: 'svc-processor', target: 'svc-queue', type: 'smoothstep', style: { stroke: '#3f3f46' }, label: '1.8/s' },
+      { id: 'e-api-db', source: 'svc-api', target: 'svc-db', type: 'smoothstep', label: '6.4/s' },
+      { id: 'e-proc-queue', source: 'svc-processor', target: 'svc-queue', type: 'smoothstep', label: '1.8/s' },
     ],
   },
 
@@ -71,9 +71,9 @@ const serviceMaps: Record<string, ServiceMapDef> = {
     edges: [
       { id: 'e-q-w', source: 'svc-queue', target: 'svc-worker', type: 'smoothstep', animated: true, style: { stroke: '#22c55e' }, label: '18.3/s' },
       { id: 'e-q-wc', source: 'svc-queue', target: 'svc-worker-canary', type: 'smoothstep', animated: true, style: { stroke: '#eab308' }, label: '6.3/s' },
-      { id: 'e-w-db', source: 'svc-worker', target: 'svc-db', type: 'smoothstep', style: { stroke: '#3f3f46' } },
-      { id: 'e-wc-db', source: 'svc-worker-canary', target: 'svc-db', type: 'smoothstep', style: { stroke: '#3f3f46' } },
-      { id: 'e-w-s3', source: 'svc-worker', target: 'svc-s3', type: 'smoothstep', style: { stroke: '#3f3f46' } },
+      { id: 'e-w-db', source: 'svc-worker', target: 'svc-db', type: 'smoothstep' },
+      { id: 'e-wc-db', source: 'svc-worker-canary', target: 'svc-db', type: 'smoothstep' },
+      { id: 'e-w-s3', source: 'svc-worker', target: 'svc-s3', type: 'smoothstep' },
     ],
   },
 
@@ -88,7 +88,7 @@ const serviceMaps: Record<string, ServiceMapDef> = {
     edges: [
       { id: 'e-api-trainer', source: 'svc-api', target: 'svc-trainer', type: 'smoothstep', style: { stroke: '#ef4444' } },
       { id: 'e-api-store', source: 'svc-api', target: 'svc-store', type: 'smoothstep', style: { stroke: '#ef4444' } },
-      { id: 'e-store-db', source: 'svc-store', target: 'svc-db', type: 'smoothstep', style: { stroke: '#3f3f46' } },
+      { id: 'e-store-db', source: 'svc-store', target: 'svc-db', type: 'smoothstep' },
     ],
   },
 }
@@ -102,7 +102,7 @@ const defaultMap: ServiceMapDef = {
   ],
   edges: [
     { id: 'e-in-app', source: 'svc-ingress', target: 'svc-app', type: 'smoothstep', animated: true, style: { stroke: '#22c55e' } },
-    { id: 'e-app-db', source: 'svc-app', target: 'svc-db', type: 'smoothstep', style: { stroke: '#3f3f46' } },
+    { id: 'e-app-db', source: 'svc-app', target: 'svc-db', type: 'smoothstep' },
   ],
 }
 

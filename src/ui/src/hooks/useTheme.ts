@@ -5,11 +5,16 @@ type Theme = 'dark' | 'light'
 export function useTheme() {
   const [theme, setTheme] = useState<Theme>(() => {
     const stored = localStorage.getItem('infraforge-theme')
-    return (stored === 'light' ? 'light' : 'dark') as Theme
+    return stored === 'light' ? 'light' : 'dark'
   })
 
   useEffect(() => {
-    document.body.classList.toggle('light', theme === 'light')
+    const root = document.documentElement
+    if (theme === 'dark') {
+      root.classList.add('dark')
+    } else {
+      root.classList.remove('dark')
+    }
     localStorage.setItem('infraforge-theme', theme)
   }, [theme])
 

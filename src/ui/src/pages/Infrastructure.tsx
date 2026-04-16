@@ -179,7 +179,8 @@ export default function Infrastructure() {
 
   const miniMapNodeColor = useCallback((node: Node) => {
     const d = node.data as InfraNodeData
-    if (d.type === 'vpc') return '#27272a'
+    // Accent colors are theme-invariant
+    if (d.type === 'vpc') return 'var(--color-border-default)'
     if (d.status === 'error') return '#ef4444'
     if (d.status === 'warning') return '#eab308'
     if (node.type === 'security') return '#6366f1'
@@ -211,7 +212,7 @@ export default function Infrastructure() {
           proOptions={{ hideAttribution: true }}
           defaultEdgeOptions={{
             type: 'smoothstep',
-            style: { strokeWidth: 1, stroke: '#3f3f46' },
+            style: { strokeWidth: 1 },
           }}
         >
           <Background variant={BackgroundVariant.Dots} gap={20} size={1} className="!bg-bg-primary" />

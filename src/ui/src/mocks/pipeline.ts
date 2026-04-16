@@ -227,7 +227,7 @@ export const runningPipelineEdges: Edge[] = [
   { id: 'pe-r-2', source: 'pipe-r-build', target: 'pipe-r-scan', type: 'smoothstep', animated: true, style: { stroke: '#22c55e' } },
   { id: 'pe-r-3', source: 'pipe-r-scan', target: 'pipe-r-push', type: 'smoothstep', animated: true, style: { stroke: '#22c55e' } },
   { id: 'pe-r-4', source: 'pipe-r-push', target: 'pipe-r-deploy', type: 'smoothstep', animated: true, style: { stroke: '#3b82f6' } },
-  { id: 'pe-r-5', source: 'pipe-r-deploy', target: 'pipe-r-verify', type: 'smoothstep', style: { stroke: '#3f3f46' } },
+  { id: 'pe-r-5', source: 'pipe-r-deploy', target: 'pipe-r-verify', type: 'smoothstep' },
 ]
 
 // Failed pipeline (dep-f1e2d3c400000007, ml-pipeline-experiment)
