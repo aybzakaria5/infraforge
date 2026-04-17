@@ -1,0 +1,71 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: infraforge-app-alerts
+  namespace: monitoring
+  labels:
+    release: infraforge-monitoring
+    app.kubernetes.io/part-of: infraforge
+spec:
+  groups:
+    # =============================================
+    # High error rate
+    # =============================================
+    - name: infraforge.api.errors
+      rules:
+        - alert: HighErrorRate
+          expr: |
+            (
+              sum(rate(http_requests_total{service="infraforge-api",status=~"5.."}[5m]))
+              /
+              sum(rate(http_requests_total{service="infraforge-api"}[5m]))
+            ) > 0.05
+          for: 5m
+          labels:
+            severity: critical
+            service: infraforge-api
+          annotations:
+            summary: "High 5xx error rate on infraforge-api"
+            description: >-
+              Error rate is {{ $value | humanizePercentage }} over the last 5 minutes.
+              Threshold: 5%.
+            runbook_url: "https://github.com/aybzakaria5/infraforge/blob/main/docs/runbooks/incident-response.md"
+            dashboard_url: "http://grafana.infraforge.local/d/infraforge-app-metrics"
+
+        - alert: ElevatedErrorRate
+          expr: |
+            (
+              sum(rate(http_requests_total{service="infraforge-api",status=~"5.."}[5m]))
+              /
+              sum(rate(http_requests_total{service="infraforge-api"}[5m]))
+            ) > 0.01
+          for: 10m
+          labels:
+            severity: warning
+            service: infraforge-api
+          annotations:
+            summary: "Elevated error rate on infraforge-api"
+            description: >-
+              Error rate is {{ $value | humanizePercentage }} over the last 10 minutes.
+              Threshold: 1%.
+            dashboard_url: "http://grafana.infraforge.local/d/infraforge-app-metrics"
+
+    # =============================================
+    # Latency
+    # =============================================
+    - name: infraforge.api.latency
+      rules:
+        - alert: HighP99Latency
+          expr: |
+            histogram_quantile(0.99,
+              sum(rate(http_request_duration_seconds_bucket{service="infraforge-api"}[5m])) by (le)
+            ) > 2.0
+          for: 5m
+          labels:
+            severity: warning
+            service: infraforge-api
+          annotations:
+            summary: "p99 latency exceeds 2s on infraforge-api"
+            description: >-
+              p99 request latency is {{ $value | humanizeDuration }}.
+            dashboard_url: "http://grafana.infraforge.local/d/infraforge-app-metrics"
