@@ -1,0 +1,33 @@
+# Local (k3d) overrides for Prometheus
+# Reduced resource footprint for local development
+
+prometheus:
+  prometheusSpec:
+    retention: 2d
+    retentionSize: 1GB
+
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: local-path
+          resources:
+            requests:
+              storage: 2Gi
+
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+
+alertmanager:
+  alertmanagerSpec:
+    resources:
+      requests:
+        cpu: 25m
+        memory: 32Mi
+      limits:
+        cpu: 100m
+        memory: 64Mi

@@ -1,0 +1,33 @@
+# AWS overrides for Prometheus
+# Uses gp3 EBS volumes and higher resource limits
+
+prometheus:
+  prometheusSpec:
+    retention: 15d
+    retentionSize: 20GB
+
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: gp3
+          resources:
+            requests:
+              storage: 50Gi
+
+    resources:
+      requests:
+        cpu: 500m
+        memory: 1Gi
+      limits:
+        cpu: "2"
+        memory: 4Gi
+
+alertmanager:
+  alertmanagerSpec:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi

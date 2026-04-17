@@ -1,0 +1,22 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: infraforge-ui
+  namespace: infraforge
+  labels:
+    app.kubernetes.io/name: infraforge-ui
+    app.kubernetes.io/part-of: infraforge
+    release: infraforge-monitoring
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: infraforge-ui
+  namespaceSelector:
+    matchNames:
+      - infraforge
+  endpoints:
+    # nginx-prometheus-exporter sidecar
+    - port: nginx-status
+      path: /metrics
+      interval: 30s
+      scrapeTimeout: 10s

@@ -1,0 +1,27 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: infraforge-api
+  namespace: infraforge
+  labels:
+    app.kubernetes.io/name: infraforge-api
+    app.kubernetes.io/part-of: infraforge
+    release: infraforge-monitoring
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: infraforge-api
+  namespaceSelector:
+    matchNames:
+      - infraforge
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 15s
+      scrapeTimeout: 10s
+      honorLabels: true
+      metricRelabelings:
+        # Drop high-cardinality Go runtime metrics we don't need
+        - sourceLabels: [__name__]
+          regex: "go_gc_.*"
+          action: drop

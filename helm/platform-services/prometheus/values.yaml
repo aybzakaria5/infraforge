@@ -1,0 +1,101 @@
+# Prometheus stack values for kube-prometheus-stack chart
+# Chart: https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
+#
+# Local mode:  helm install monitoring prometheus-community/kube-prometheus-stack -f values.yaml -f values-local.yaml
+# AWS mode:    helm install monitoring prometheus-community/kube-prometheus-stack -f values.yaml -f values-aws.yaml
+
+nameOverride: infraforge-monitoring
+
+# --- Global scrape settings ---
+prometheus:
+  prometheusSpec:
+    scrapeInterval: 15s
+    evaluationInterval: 15s
+    retention: 7d
+    retentionSize: 5GB
+
+    # Storage — overridden per environment
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 10Gi
+
+    # Resource limits
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        cpu: "1"
+        memory: 2Gi
+
+    # Additional scrape configs for app-level metrics
+    additionalScrapeConfigs:
+      # Scrape infraforge-api /metrics endpoint
+      - job_name: infraforge-api
+        kubernetes_sd_configs:
+          - role: endpoints
+            namespaces:
+              names:
+                - infraforge
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_service_name]
+            regex: infraforge-api
+            action: keep
+          - source_labels: [__meta_kubernetes_endpoint_port_name]
+            regex: metrics
+            action: keep
+          - source_labels: [__meta_kubernetes_namespace]
+            target_label: namespace
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: pod
+
+      # Scrape nginx (infraforge-ui) stub_status
+      - job_name: infraforge-ui-nginx
+        metrics_path: /stub_status
+        kubernetes_sd_configs:
+          - role: endpoints
+            namespaces:
+              names:
+                - infraforge
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_service_name]
+            regex: infraforge-ui
+            action: keep
+          - source_labels: [__meta_kubernetes_endpoint_port_name]
+            regex: nginx-status
+            action: keep
+
+  # ServiceMonitor for auto-discovery
+  serviceMonitorSelectorNilUsesHelmValues: false
+  podMonitorSelectorNilUsesHelmValues: false
+
+# --- Service Monitors ---
+# These are created as separate resources by the chart when defined here,
+# but we also define custom ones below for our app services.
+
+# --- Alertmanager (basic config, rules defined separately) ---
+alertmanager:
+  alertmanagerSpec:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 200m
+        memory: 128Mi
+
+# --- Node exporter ---
+nodeExporter:
+  enabled: true
+
+# --- kube-state-metrics ---
+kubeStateMetrics:
+  enabled: true
+
+# --- Grafana is deployed separately ---
+grafana:
+  enabled: false
