@@ -1,0 +1,27 @@
+# Local (k3d) overrides for Loki
+# Shorter retention, smaller storage, fewer resources
+
+loki:
+  limits_config:
+    retention_period: 24h
+
+singleBinary:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 250m
+      memory: 512Mi
+  persistence:
+    storageClassName: local-path
+    size: 2Gi
+
+gateway:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 16Mi
+    limits:
+      cpu: 50m
+      memory: 32Mi
