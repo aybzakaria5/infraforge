@@ -1,0 +1,84 @@
+# Grafana values for the grafana/grafana chart
+# Chart: https://github.com/grafana/helm-charts/tree/main/charts/grafana
+#
+# Dashboards are provisioned from ConfigMaps created by the sidecar.
+# JSON files in dashboards/ are loaded via the dashboardProviders config below.
+
+nameOverride: infraforge-grafana
+
+replicas: 1
+
+adminUser: admin
+# adminPassword set via secret in production; defaults to "admin" locally
+
+persistence:
+  enabled: true
+  size: 1Gi
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+# --- Data sources (provisioned automatically) ---
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        url: http://infraforge-monitoring-prometheus:9090
+        access: proxy
+        isDefault: true
+        editable: false
+        jsonData:
+          timeInterval: 15s
+
+      - name: Loki
+        type: loki
+        url: http://infraforge-loki:3100
+        access: proxy
+        editable: false
+        jsonData:
+          maxLines: 1000
+
+# --- Dashboard provisioning via sidecar ---
+sidecar:
+  dashboards:
+    enabled: true
+    label: grafana_dashboard
+    labelValue: "1"
+    folder: /tmp/dashboards
+    searchNamespace: ALL
+
+# --- Dashboard providers ---
+dashboardProviders:
+  dashboardproviders.yaml:
+    apiVersion: 1
+    providers:
+      - name: infraforge
+        orgId: 1
+        folder: InfraForge
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/infraforge
+
+# --- Dashboards loaded from ConfigMaps ---
+dashboardsConfigMaps:
+  infraforge: infraforge-grafana-dashboards
+
+# --- Grafana config ---
+grafana.ini:
+  server:
+    root_url: "%(protocol)s://%(domain)s:%(http_port)s/grafana/"
+    serve_from_sub_path: true
+  auth.anonymous:
+    enabled: true
+    org_role: Viewer
+  dashboards:
+    default_home_dashboard_path: /var/lib/grafana/dashboards/infraforge/cluster-health.json

@@ -1,0 +1,259 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Resource cost estimation based on CPU/memory requests and node utilization",
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "title": "Total CPU Requested vs Capacity",
+      "type": "gauge",
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 0 },
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum(kube_pod_container_resource_requests{resource=\"cpu\"}) / sum(kube_node_status_allocatable{resource=\"cpu\"})",
+          "legendFormat": "CPU Allocation",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.7 },
+              { "color": "red", "value": 0.9 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "title": "Total Memory Requested vs Capacity",
+      "type": "gauge",
+      "gridPos": { "h": 6, "w": 8, "x": 8, "y": 0 },
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum(kube_pod_container_resource_requests{resource=\"memory\"}) / sum(kube_node_status_allocatable{resource=\"memory\"})",
+          "legendFormat": "Memory Allocation",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.75 },
+              { "color": "red", "value": 0.9 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "title": "PVC Storage Used",
+      "type": "gauge",
+      "gridPos": { "h": 6, "w": 8, "x": 16, "y": 0 },
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum(kubelet_volume_stats_used_bytes) / sum(kubelet_volume_stats_capacity_bytes)",
+          "legendFormat": "Storage",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.7 },
+              { "color": "red", "value": 0.85 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "title": "CPU Requests by Namespace",
+      "type": "piechart",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum by (namespace) (kube_pod_container_resource_requests{resource=\"cpu\"})",
+          "legendFormat": "{{namespace}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        }
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] },
+        "pieType": "donut",
+        "tooltip": { "mode": "single" }
+      }
+    },
+    {
+      "title": "Memory Requests by Namespace",
+      "type": "piechart",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum by (namespace) (kube_pod_container_resource_requests{resource=\"memory\"})",
+          "legendFormat": "{{namespace}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        }
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] },
+        "pieType": "donut",
+        "tooltip": { "mode": "single" }
+      }
+    },
+    {
+      "title": "Estimated Monthly Cost by Namespace",
+      "description": "Rough estimate: $0.0425/vCPU-hour + $0.0053/GB-hour (on-demand m5.xlarge pricing us-east-1)",
+      "type": "bargauge",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 14 },
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "(sum by (namespace) (kube_pod_container_resource_requests{resource=\"cpu\"}) * 0.0425 + sum by (namespace) (kube_pod_container_resource_requests{resource=\"memory\"}) / 1073741824 * 0.0053) * 730",
+          "legendFormat": "{{namespace}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 50 },
+              { "color": "orange", "value": 150 },
+              { "color": "red", "value": 300 }
+            ]
+          }
+        }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient"
+      }
+    },
+    {
+      "title": "Resource Requests vs Actual Usage (CPU)",
+      "description": "Shows over-provisioning — the gap between what's requested and what's actually used",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 22 },
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum(kube_pod_container_resource_requests{namespace=\"infraforge\",resource=\"cpu\"})",
+          "legendFormat": "Requested",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"infraforge\"}[5m]))",
+          "legendFormat": "Actual",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "showPoints": "never"
+          }
+        }
+      }
+    },
+    {
+      "title": "Resource Requests vs Actual Usage (Memory)",
+      "description": "Shows over-provisioning — the gap between what's requested and what's actually used",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 22 },
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum(kube_pod_container_resource_requests{namespace=\"infraforge\",resource=\"memory\"})",
+          "legendFormat": "Requested",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(container_memory_working_set_bytes{namespace=\"infraforge\"})",
+          "legendFormat": "Actual",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "showPoints": "never"
+          }
+        }
+      }
+    }
+  ],
+  "refresh": "1m",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": ["infraforge", "cost", "capacity"],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "InfraForge — Cost Overview",
+  "uid": "infraforge-cost-overview",
+  "version": 1
+}
