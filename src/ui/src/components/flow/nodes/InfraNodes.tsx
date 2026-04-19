@@ -36,14 +36,16 @@ const statusColor: Record<string, string> = {
 }
 
 const typeAccent: Record<string, string> = {
-  eks: 'var(--color-accent-neutral)',
-  rds: 'var(--color-accent-info)',
-  s3: 'var(--color-accent-warning)',
+  eks: '#6366f1',
+  rds: '#3b82f6',
+  s3: '#eab308',
   alb: '#14b8a6',
-  ecr: 'var(--color-accent-neutral)',
-  route53: 'var(--color-accent-info)',
+  ecr: '#f97316',
+  route53: '#8b5cf6',
   nat: 'var(--color-accent-info)',
   subnet: 'var(--color-border-hover)',
+  iam: '#a855f7',
+  kms: '#ec4899',
 }
 
 const handleClass = '!w-1.5 !h-1.5 !bg-border-hover !border-0'
@@ -52,11 +54,11 @@ const handleClass = '!w-1.5 !h-1.5 !bg-border-hover !border-0'
 export const VpcNode = memo(function VpcNode({ data }: NodeProps) {
   const d = data as InfraNodeData
   return (
-    <div className="w-full h-full rounded-[6px] border border-dashed border-border-default bg-bg-primary/80 relative">
+    <div className="w-full h-full rounded-[12px] border border-dashed border-border-default bg-bg-primary/85 relative">
       <Handle type="target" position={Position.Top} className={handleClass} />
       <Handle type="source" position={Position.Bottom} className={handleClass} />
 
-      <div className="absolute top-1.5 left-2.5 flex items-center gap-1.5">
+      <div className="absolute top-2 left-3 flex items-center gap-1.5">
         <span className="px-1 py-0.5 rounded bg-accent-info/10 text-accent-info text-[9px] font-medium uppercase tracking-wide">
           VPC
         </span>
@@ -67,7 +69,7 @@ export const VpcNode = memo(function VpcNode({ data }: NodeProps) {
         />
       </div>
 
-      <div className="absolute bottom-1.5 left-2.5 flex items-center gap-3 text-[9px] text-text-tertiary font-mono">
+      <div className="absolute bottom-1.5 left-3 flex items-center gap-3 text-[9px] text-text-tertiary font-mono">
         {d.detail && <span>{d.detail}</span>}
         {d.cost && <span className="text-accent-warning">{d.cost}</span>}
       </div>
@@ -84,8 +86,8 @@ export const ServiceNode = memo(function ServiceNode({ data }: NodeProps) {
   return (
     <div
       className="py-1.5 pr-2.5 pl-0 rounded-[6px] border border-border-default bg-bg-tertiary
-        transition-all duration-150 cursor-pointer max-w-[200px]"
-      style={{ borderLeftWidth: 2, borderLeftColor: accent }}
+        transition-[border-color,box-shadow,transform] duration-150 cursor-pointer"
+      style={{ borderLeftWidth: 2, borderLeftColor: accent, maxWidth: 200, padding: '8px 12px 8px 0' }}
     >
       <Handle type="target" position={Position.Top} className={handleClass} />
       <Handle type="source" position={Position.Bottom} className={handleClass} />
@@ -95,23 +97,23 @@ export const ServiceNode = memo(function ServiceNode({ data }: NodeProps) {
       <div className="flex items-start gap-1.5 pl-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1">
-            <Icon size={10} className="text-text-tertiary shrink-0" />
-            <span className="text-[9px] uppercase tracking-wide text-text-tertiary">{d.type}</span>
+            <Icon size={12} className="text-text-tertiary shrink-0" />
+            <span className="text-[10px] uppercase tracking-wide text-text-tertiary">{d.type}</span>
           </div>
           <div className="flex items-center gap-1.5 mt-0.5">
-            <span className="text-[11px] font-mono text-text-primary truncate leading-tight">{d.label}</span>
+            <span className="text-[12px] font-mono text-text-primary truncate leading-tight">{d.label}</span>
             <span
               className="inline-block w-1.5 h-1.5 rounded-full shrink-0"
               style={{ backgroundColor: statusColor[d.status] }}
             />
           </div>
           {d.detail && (
-            <div className="text-[9px] font-mono text-text-tertiary truncate mt-0.5">{d.detail}</div>
+            <div className="text-[10px] font-mono text-text-tertiary truncate mt-0.5">{d.detail}</div>
           )}
         </div>
       </div>
       {d.cost && (
-        <div className="pl-2 mt-0.5 text-[9px] font-mono text-accent-warning">{d.cost}</div>
+        <div className="pl-2 mt-0.5 text-[10px] font-mono text-accent-warning">{d.cost}</div>
       )}
     </div>
   )
@@ -121,12 +123,13 @@ export const ServiceNode = memo(function ServiceNode({ data }: NodeProps) {
 export const SecurityNode = memo(function SecurityNode({ data }: NodeProps) {
   const d = data as InfraNodeData
   const Icon = typeIcon[d.type] || Lock
+  const accent = typeAccent[d.type] || 'var(--color-accent-neutral)'
 
   return (
     <div
       className="py-1.5 pr-2.5 pl-0 rounded-[6px] border border-accent-neutral/30 bg-bg-tertiary
-        transition-all duration-150 cursor-pointer max-w-[200px]"
-      style={{ borderLeftWidth: 2, borderLeftColor: 'var(--color-accent-neutral)' }}
+        transition-[border-color,box-shadow,transform] duration-150 cursor-pointer"
+      style={{ borderLeftWidth: 2, borderLeftColor: accent, maxWidth: 200, padding: '8px 12px 8px 0' }}
     >
       <Handle type="target" position={Position.Top} className="!w-1.5 !h-1.5 !bg-accent-neutral/50 !border-0" />
       <Handle type="source" position={Position.Bottom} className="!w-1.5 !h-1.5 !bg-accent-neutral/50 !border-0" />
@@ -136,23 +139,23 @@ export const SecurityNode = memo(function SecurityNode({ data }: NodeProps) {
       <div className="flex items-start gap-1.5 pl-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1">
-            <Icon size={10} className="text-accent-neutral shrink-0" />
-            <span className="text-[9px] uppercase tracking-wide text-text-tertiary">{d.type}</span>
+            <Icon size={12} className="text-accent-neutral shrink-0" />
+            <span className="text-[10px] uppercase tracking-wide text-text-tertiary">{d.type}</span>
           </div>
           <div className="flex items-center gap-1.5 mt-0.5">
-            <span className="text-[11px] font-mono text-text-primary truncate leading-tight">{d.label}</span>
+            <span className="text-[12px] font-mono text-text-primary truncate leading-tight">{d.label}</span>
             <span
               className="inline-block w-1.5 h-1.5 rounded-full shrink-0"
               style={{ backgroundColor: statusColor[d.status] }}
             />
           </div>
           {d.detail && (
-            <div className="text-[9px] font-mono text-text-tertiary truncate mt-0.5 max-w-[180px]">{d.detail}</div>
+            <div className="text-[10px] font-mono text-text-tertiary truncate mt-0.5 max-w-[180px]">{d.detail}</div>
           )}
         </div>
       </div>
       {d.cost && (
-        <div className="pl-2 mt-0.5 text-[9px] font-mono text-accent-warning">{d.cost}</div>
+        <div className="pl-2 mt-0.5 text-[10px] font-mono text-accent-warning">{d.cost}</div>
       )}
     </div>
   )

@@ -28,8 +28,8 @@ const nodeTypes: NodeTypes = {
   verifyNode: VerifyNode,
 }
 
-const NODE_WIDTH = 170
-const NODE_HEIGHT = 80
+const NODE_WIDTH = 180
+const NODE_HEIGHT = 64
 
 function layoutPipeline(nodes: Node[], edges: Edge[]): Node[] {
   const g = new dagre.graphlib.Graph()

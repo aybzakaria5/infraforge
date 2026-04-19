@@ -22,21 +22,19 @@ export const MicroserviceNode = memo(function MicroserviceNode({ data }: NodePro
 
   return (
     <div
-      className="px-2.5 py-1.5 rounded-[6px] border border-border-default bg-bg-tertiary
-        transition-all duration-150"
-      style={{ width: 152 }}
+      className="flex items-center gap-1.5 rounded-[6px] border border-border-default bg-bg-tertiary
+        transition-[border-color,box-shadow] duration-150 cursor-default"
+      style={{ width: 160, height: 40, padding: '0 10px' }}
     >
       <Handle type="target" position={Position.Left} className={handleClass} />
       <Handle type="source" position={Position.Right} className={handleClass} />
 
-      <div className="flex items-center gap-1.5">
-        <span
-          className="inline-block w-1.5 h-1.5 rounded-full shrink-0"
-          style={{ backgroundColor: dotColor }}
-        />
-        <span className="text-[11px] font-mono text-text-primary leading-tight truncate">{d.label}</span>
-      </div>
-      <div className="mt-0.5 text-[9px] font-mono text-text-tertiary pl-3">{d.reqRate}</div>
+      <span
+        className="inline-block w-1.5 h-1.5 rounded-full shrink-0"
+        style={{ backgroundColor: dotColor }}
+      />
+      <span className="text-[11px] font-mono text-text-primary leading-tight truncate">{d.label}</span>
+      <span className="text-[10px] font-mono text-text-tertiary ml-auto shrink-0">{d.reqRate}</span>
     </div>
   )
 })
