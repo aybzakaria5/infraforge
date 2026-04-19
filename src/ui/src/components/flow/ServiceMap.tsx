@@ -94,7 +94,8 @@ function ServiceMapInner({ envId }: ServiceMapProps) {
 
 export const ServiceMap = memo(function ServiceMap(props: ServiceMapProps) {
   return (
-    <div className="h-[260px] w-full rounded-[6px] border border-border-default overflow-hidden">
+    <div className="h-[260px] w-full rounded-[6px] border border-border-default overflow-hidden
+      animate-[fadeIn_400ms_ease-out]">
       <ReactFlowProvider>
         <ServiceMapInner {...props} />
       </ReactFlowProvider>

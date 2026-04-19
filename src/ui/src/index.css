@@ -237,6 +237,12 @@ body {
   stroke-width: 2.5 !important;
 }
 
+/* --- Graph container fade-in --- */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 /* --- Shimmer animation for progress bars --- */
 @keyframes shimmer {
   0% { background-position: -200% 0; }

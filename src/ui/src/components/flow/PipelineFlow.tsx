@@ -133,7 +133,8 @@ function PipelineFlowInner({ nodes, edges, onNodeClick }: PipelineFlowProps) {
 
 export const PipelineFlow = memo(function PipelineFlow(props: PipelineFlowProps) {
   return (
-    <div className="h-[200px] w-full rounded-[6px] border border-border-default overflow-hidden">
+    <div className="h-[200px] w-full rounded-[6px] border border-border-default overflow-hidden
+      animate-[fadeIn_400ms_ease-out]">
       <ReactFlowProvider>
         <PipelineFlowInner {...props} />
       </ReactFlowProvider>
