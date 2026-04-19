@@ -210,16 +210,24 @@ body {
 }
 .react-flow__node:hover > div {
   border-color: var(--color-rf-node-border-hover) !important;
-  box-shadow: 0 0 0 1px rgba(99,102,241,0.2), 0 2px 8px rgba(0,0,0,0.3);
+  box-shadow: 0 0 0 1px rgba(99,102,241,0.4), 0 8px 24px rgba(0,0,0,0.5);
+  transform: translateY(-1px);
 }
 .react-flow__node.selected > div {
   border-color: var(--color-rf-node-border-selected) !important;
-  box-shadow: 0 0 0 1px rgba(99,102,241,0.4), 0 4px 12px rgba(0,0,0,0.4);
-  transform: scale(1.02);
+  box-shadow: 0 0 0 2px rgba(99,102,241,0.5), 0 0 20px rgba(99,102,241,0.15);
+  transform: scale(1.03);
+  animation: selected-pulse 2s ease-in-out infinite;
+}
+@keyframes selected-pulse {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(99,102,241,0.3), 0 0 20px rgba(99,102,241,0.1); }
+  50% { box-shadow: 0 0 0 2px rgba(99,102,241,0.6), 0 0 20px rgba(99,102,241,0.2); }
 }
 .react-flow__node.dragging > div {
-  opacity: 0.85;
   cursor: grabbing;
+  transform: scale(1.05);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+  z-index: 1000;
 }
 /* --- Edge interaction states --- */
 .react-flow__edge-path {

@@ -13,6 +13,7 @@ import { AnimatedFlowEdge } from './edges/AnimatedEdge'
 import { getServiceMap } from '../../mocks/servicemap'
 import { useCascadeAnimation } from '../../hooks/useCascadeAnimation'
 import { useNodeSpotlight } from '../../hooks/useNodeSpotlight'
+import { useDragEffects } from '../../hooks/useDragEffects'
 
 const nodeTypes: NodeTypes = {
   microservice: MicroserviceNode,
@@ -46,20 +47,30 @@ function ServiceMapInner({ envId }: ServiceMapProps) {
     onNodeMouseEnter,
     onNodeMouseLeave,
   } = useNodeSpotlight(nodes, animatedEdges)
+  const {
+    dragNodes,
+    onNodeDragStart,
+    onNodeDragStop,
+    isDragging,
+  } = useDragEffects(spotlightNodes, spotlightEdges)
 
   const onInit = useCallback(() => {
     setTimeout(() => fitView({ duration: 800, padding: 0.25 }), 50)
   }, [fitView])
 
+  const finalNodes = isDragging ? dragNodes : spotlightNodes
+
   return (
     <ReactFlow
-      nodes={spotlightNodes}
+      nodes={finalNodes}
       edges={spotlightEdges}
       nodeTypes={nodeTypes}
       edgeTypes={edgeTypes}
       defaultEdgeOptions={defaultEdgeOptions}
       onNodeMouseEnter={onNodeMouseEnter}
       onNodeMouseLeave={onNodeMouseLeave}
+      onNodeDragStart={onNodeDragStart}
+      onNodeDragStop={onNodeDragStop}
       onInit={onInit}
       nodesDraggable
       nodesConnectable={false}

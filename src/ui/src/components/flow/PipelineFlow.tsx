@@ -24,6 +24,7 @@ import { AnimatedFlowEdge } from './edges/AnimatedEdge'
 import { FailedEdge } from './edges/FailedEdge'
 import { useCascadeAnimation } from '../../hooks/useCascadeAnimation'
 import { useNodeSpotlight } from '../../hooks/useNodeSpotlight'
+import { useDragEffects } from '../../hooks/useDragEffects'
 
 const nodeTypes: NodeTypes = {
   gitNode: GitNode,
@@ -79,6 +80,12 @@ function PipelineFlowInner({ nodes, edges, onNodeClick }: PipelineFlowProps) {
     onNodeMouseEnter,
     onNodeMouseLeave,
   } = useNodeSpotlight(layoutNodes, animatedEdges)
+  const {
+    dragNodes,
+    onNodeDragStart,
+    onNodeDragStop,
+    isDragging,
+  } = useDragEffects(spotlightNodes, spotlightEdges)
 
   const handleNodeClick: NodeMouseHandler = useCallback(
     (_, node) => onNodeClick?.(node.id),
@@ -89,15 +96,19 @@ function PipelineFlowInner({ nodes, edges, onNodeClick }: PipelineFlowProps) {
     setTimeout(() => fitView({ duration: 800, padding: 0.2 }), 50)
   }, [fitView])
 
+  const finalNodes = isDragging ? dragNodes : spotlightNodes
+
   return (
     <ReactFlow
-      nodes={spotlightNodes}
+      nodes={finalNodes}
       edges={spotlightEdges}
       nodeTypes={nodeTypes}
       edgeTypes={edgeTypes}
       onNodeClick={handleNodeClick}
       onNodeMouseEnter={onNodeMouseEnter}
       onNodeMouseLeave={onNodeMouseLeave}
+      onNodeDragStart={onNodeDragStart}
+      onNodeDragStop={onNodeDragStop}
       onInit={onInit}
       nodesDraggable
       nodesConnectable={false}
