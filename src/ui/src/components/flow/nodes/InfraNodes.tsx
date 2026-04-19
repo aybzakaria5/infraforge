@@ -36,6 +36,12 @@ const statusColor: Record<string, string> = {
   error: 'var(--color-accent-danger)',
 }
 
+const statusGlow: Record<string, string> = {
+  healthy: '0 0 4px rgba(34,197,94,0.5)',
+  warning: '0 0 4px rgba(234,179,8,0.5)',
+  error: '0 0 4px rgba(239,68,68,0.5)',
+}
+
 const typeAccent: Record<string, string> = {
   eks: '#6366f1',
   rds: '#3b82f6',
@@ -49,6 +55,20 @@ const typeAccent: Record<string, string> = {
   kms: '#ec4899',
 }
 
+const typeLabel: Record<string, string> = {
+  eks: 'EKS CLUSTER',
+  rds: 'RDS DATABASE',
+  s3: 'S3 BUCKET',
+  alb: 'LOAD BALANCER',
+  ecr: 'CONTAINER REGISTRY',
+  route53: 'DNS ZONE',
+  nat: 'NAT GATEWAY',
+  subnet: 'SUBNET',
+  iam: 'IAM ROLE',
+  kms: 'KMS KEY',
+  vpc: 'VPC',
+}
+
 const handleClass = '!w-1.5 !h-1.5 !bg-border-hover !border-0'
 
 // --- VPC group node (parent container) ---
@@ -57,7 +77,8 @@ export const VpcNode = memo(function VpcNode({ data }: NodeProps) {
   const idx = (d as Record<string, unknown>)._nodeIndex as number ?? 0
   return (
     <AnimatedNodeWrapper index={idx}>
-      <div className="w-full h-full rounded-[12px] border border-dashed border-border-default bg-bg-primary/85 relative">
+      <div className="w-full h-full rounded-[12px] border border-dashed border-border-default bg-bg-primary/85
+        hover:border-solid hover:border-border-hover transition-[border-style,border-color,background] duration-150 relative">
         <Handle type="target" position={Position.Top} className={handleClass} />
         <Handle type="source" position={Position.Bottom} className={handleClass} />
 
@@ -68,7 +89,7 @@ export const VpcNode = memo(function VpcNode({ data }: NodeProps) {
           <span className="text-[10px] font-mono text-text-secondary">{d.label}</span>
           <span
             className="inline-block w-1.5 h-1.5 rounded-full"
-            style={{ backgroundColor: statusColor[d.status] }}
+            style={{ backgroundColor: statusColor[d.status], boxShadow: statusGlow[d.status] }}
           />
         </div>
 
@@ -91,32 +112,36 @@ export const ServiceNode = memo(function ServiceNode({ data }: NodeProps) {
   return (
     <AnimatedNodeWrapper index={idx}>
     <div
-      className="py-1.5 pr-2.5 pl-0 rounded-[6px] border border-border-default bg-bg-tertiary
+      className="group rounded-[6px] border border-border-default bg-bg-tertiary
         transition-[border-color,box-shadow,transform] duration-150 cursor-pointer"
-      style={{ borderLeftWidth: 2, borderLeftColor: accent, maxWidth: 200, padding: '8px 12px 8px 0' }}
+      style={{ borderLeftWidth: 2, borderLeftColor: accent, maxWidth: 200, padding: '6px 10px 6px 0' }}
     >
       <Handle type="target" position={Position.Top} className={handleClass} />
       <Handle type="source" position={Position.Bottom} className={handleClass} />
       <Handle type="target" position={Position.Left} id="left" className={handleClass} />
       <Handle type="source" position={Position.Right} id="right" className={handleClass} />
 
-      <div className="flex items-start gap-1.5 pl-2">
+      <div className="flex items-start justify-between pl-2">
         <div className="flex-1 min-w-0">
+          {/* Row 1: icon + type label */}
           <div className="flex items-center gap-1">
             <Icon size={12} className="text-text-tertiary shrink-0" />
-            <span className="text-[10px] uppercase tracking-wide text-text-tertiary">{d.type}</span>
+            <span className="text-[10px] uppercase tracking-wide text-text-tertiary">
+              {typeLabel[d.type] || d.type}
+            </span>
           </div>
-          <div className="flex items-center gap-1.5 mt-0.5">
-            <span className="text-[12px] font-mono text-text-primary truncate leading-tight">{d.label}</span>
-            <span
-              className="inline-block w-1.5 h-1.5 rounded-full shrink-0"
-              style={{ backgroundColor: statusColor[d.status] }}
-            />
-          </div>
+          {/* Row 2: resource name */}
+          <div className="text-[12px] font-mono text-text-primary truncate leading-tight mt-0.5">{d.label}</div>
+          {/* Row 3: metadata */}
           {d.detail && (
             <div className="text-[10px] font-mono text-text-tertiary truncate mt-0.5">{d.detail}</div>
           )}
         </div>
+        {/* Status dot */}
+        <span
+          className="inline-block w-1.5 h-1.5 rounded-full shrink-0 mt-1"
+          style={{ backgroundColor: statusColor[d.status], boxShadow: statusGlow[d.status] }}
+        />
       </div>
       {d.cost && (
         <div className="pl-2 mt-0.5 text-[10px] font-mono text-accent-warning">{d.cost}</div>
@@ -136,32 +161,32 @@ export const SecurityNode = memo(function SecurityNode({ data }: NodeProps) {
   return (
     <AnimatedNodeWrapper index={idx}>
     <div
-      className="py-1.5 pr-2.5 pl-0 rounded-[6px] border border-accent-neutral/30 bg-bg-tertiary
+      className="group rounded-[6px] border border-accent-neutral/30 bg-bg-tertiary
         transition-[border-color,box-shadow,transform] duration-150 cursor-pointer"
-      style={{ borderLeftWidth: 2, borderLeftColor: accent, maxWidth: 200, padding: '8px 12px 8px 0' }}
+      style={{ borderLeftWidth: 2, borderLeftColor: accent, maxWidth: 200, padding: '6px 10px 6px 0' }}
     >
       <Handle type="target" position={Position.Top} className="!w-1.5 !h-1.5 !bg-accent-neutral/50 !border-0" />
       <Handle type="source" position={Position.Bottom} className="!w-1.5 !h-1.5 !bg-accent-neutral/50 !border-0" />
       <Handle type="target" position={Position.Left} id="left" className="!w-1.5 !h-1.5 !bg-accent-neutral/50 !border-0" />
       <Handle type="source" position={Position.Right} id="right" className="!w-1.5 !h-1.5 !bg-accent-neutral/50 !border-0" />
 
-      <div className="flex items-start gap-1.5 pl-2">
+      <div className="flex items-start justify-between pl-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1">
             <Icon size={12} className="text-accent-neutral shrink-0" />
-            <span className="text-[10px] uppercase tracking-wide text-text-tertiary">{d.type}</span>
+            <span className="text-[10px] uppercase tracking-wide text-text-tertiary">
+              {typeLabel[d.type] || d.type}
+            </span>
           </div>
-          <div className="flex items-center gap-1.5 mt-0.5">
-            <span className="text-[12px] font-mono text-text-primary truncate leading-tight">{d.label}</span>
-            <span
-              className="inline-block w-1.5 h-1.5 rounded-full shrink-0"
-              style={{ backgroundColor: statusColor[d.status] }}
-            />
-          </div>
+          <div className="text-[12px] font-mono text-text-primary truncate leading-tight mt-0.5">{d.label}</div>
           {d.detail && (
             <div className="text-[10px] font-mono text-text-tertiary truncate mt-0.5 max-w-[180px]">{d.detail}</div>
           )}
         </div>
+        <span
+          className="inline-block w-1.5 h-1.5 rounded-full shrink-0 mt-1"
+          style={{ backgroundColor: statusColor[d.status], boxShadow: statusGlow[d.status] }}
+        />
       </div>
       {d.cost && (
         <div className="pl-2 mt-0.5 text-[10px] font-mono text-accent-warning">{d.cost}</div>
