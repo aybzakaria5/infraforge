@@ -19,7 +19,7 @@ const serviceMaps: Record<string, ServiceMapDef> = {
       { id: 'svc-cache', type: 'microservice', position: { x: 620, y: 60 }, data: { label: 'redis', health: 'healthy', reqRate: '210.5 ops/s' } },
     ],
     edges: [
-      { id: 'e-in-api', source: 'svc-ingress', target: 'svc-api', type: 'smoothstep', animated: true, style: { stroke: '#22c55e' }, label: '142.8/s' },
+      { id: 'e-in-api', source: 'svc-ingress', target: 'svc-api', type: 'animated', style: { stroke: '#22c55e' }, label: '142.8/s' },
       { id: 'e-in-auth', source: 'svc-ingress', target: 'svc-auth', type: 'smoothstep', label: '38.4/s' },
       { id: 'e-api-worker', source: 'svc-api', target: 'svc-worker', type: 'smoothstep', label: '12.1/s' },
       { id: 'e-api-db', source: 'svc-api', target: 'svc-db', type: 'smoothstep', label: '84.2/s' },
@@ -38,7 +38,7 @@ const serviceMaps: Record<string, ServiceMapDef> = {
       { id: 'svc-cache', type: 'microservice', position: { x: 420, y: 80 }, data: { label: 'redis', health: 'healthy', reqRate: '22.3 ops/s' } },
     ],
     edges: [
-      { id: 'e-in-auth', source: 'svc-ingress', target: 'svc-auth', type: 'smoothstep', animated: true, style: { stroke: '#22c55e' }, label: '8.2/s' },
+      { id: 'e-in-auth', source: 'svc-ingress', target: 'svc-auth', type: 'animated', style: { stroke: '#22c55e' }, label: '8.2/s' },
       { id: 'e-auth-db', source: 'svc-auth', target: 'svc-db', type: 'smoothstep', label: '14.6/s' },
       { id: 'e-auth-cache', source: 'svc-auth', target: 'svc-cache', type: 'smoothstep', label: '22.3/s' },
     ],
@@ -53,7 +53,7 @@ const serviceMaps: Record<string, ServiceMapDef> = {
       { id: 'svc-queue', type: 'microservice', position: { x: 440, y: 40 }, data: { label: 'sqs-queue', health: 'healthy', reqRate: '1.8 msg/s' } },
     ],
     edges: [
-      { id: 'e-api-proc', source: 'svc-api', target: 'svc-processor', type: 'smoothstep', animated: true, style: { stroke: '#22c55e' }, label: '1.8/s' },
+      { id: 'e-api-proc', source: 'svc-api', target: 'svc-processor', type: 'animated', style: { stroke: '#22c55e' }, label: '1.8/s' },
       { id: 'e-api-db', source: 'svc-api', target: 'svc-db', type: 'smoothstep', label: '6.4/s' },
       { id: 'e-proc-queue', source: 'svc-processor', target: 'svc-queue', type: 'smoothstep', label: '1.8/s' },
     ],
@@ -69,8 +69,8 @@ const serviceMaps: Record<string, ServiceMapDef> = {
       { id: 'svc-s3', type: 'microservice', position: { x: 440, y: 80 }, data: { label: 's3-results', health: 'healthy', reqRate: '4.2 put/s' } },
     ],
     edges: [
-      { id: 'e-q-w', source: 'svc-queue', target: 'svc-worker', type: 'smoothstep', animated: true, style: { stroke: '#22c55e' }, label: '18.3/s' },
-      { id: 'e-q-wc', source: 'svc-queue', target: 'svc-worker-canary', type: 'smoothstep', animated: true, style: { stroke: '#eab308' }, label: '6.3/s' },
+      { id: 'e-q-w', source: 'svc-queue', target: 'svc-worker', type: 'animated', style: { stroke: '#22c55e' }, label: '18.3/s' },
+      { id: 'e-q-wc', source: 'svc-queue', target: 'svc-worker-canary', type: 'animated', style: { stroke: '#eab308' }, label: '6.3/s' },
       { id: 'e-w-db', source: 'svc-worker', target: 'svc-db', type: 'smoothstep' },
       { id: 'e-wc-db', source: 'svc-worker-canary', target: 'svc-db', type: 'smoothstep' },
       { id: 'e-w-s3', source: 'svc-worker', target: 'svc-s3', type: 'smoothstep' },
@@ -101,7 +101,7 @@ const defaultMap: ServiceMapDef = {
     { id: 'svc-db', type: 'microservice', position: { x: 440, y: 40 }, data: { label: 'postgresql', health: 'healthy', reqRate: '—' } },
   ],
   edges: [
-    { id: 'e-in-app', source: 'svc-ingress', target: 'svc-app', type: 'smoothstep', animated: true, style: { stroke: '#22c55e' } },
+    { id: 'e-in-app', source: 'svc-ingress', target: 'svc-app', type: 'animated', style: { stroke: '#22c55e' } },
     { id: 'e-app-db', source: 'svc-app', target: 'svc-db', type: 'smoothstep' },
   ],
 }

@@ -9,12 +9,17 @@ import {
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import { MicroserviceNode } from './nodes/MicroserviceNode'
+import { AnimatedFlowEdge } from './edges/AnimatedEdge'
 import { getServiceMap } from '../../mocks/servicemap'
 import { useCascadeAnimation } from '../../hooks/useCascadeAnimation'
 import { useNodeSpotlight } from '../../hooks/useNodeSpotlight'
 
 const nodeTypes: NodeTypes = {
   microservice: MicroserviceNode,
+}
+
+const edgeTypes = {
+  animated: AnimatedFlowEdge,
 }
 
 const defaultEdgeOptions = {
@@ -51,6 +56,7 @@ function ServiceMapInner({ envId }: ServiceMapProps) {
       nodes={spotlightNodes}
       edges={spotlightEdges}
       nodeTypes={nodeTypes}
+      edgeTypes={edgeTypes}
       defaultEdgeOptions={defaultEdgeOptions}
       onNodeMouseEnter={onNodeMouseEnter}
       onNodeMouseLeave={onNodeMouseLeave}

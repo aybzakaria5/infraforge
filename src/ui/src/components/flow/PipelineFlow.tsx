@@ -20,6 +20,8 @@ import {
   DeployNode,
   VerifyNode,
 } from './nodes/PipelineNodes'
+import { AnimatedFlowEdge } from './edges/AnimatedEdge'
+import { FailedEdge } from './edges/FailedEdge'
 import { useCascadeAnimation } from '../../hooks/useCascadeAnimation'
 import { useNodeSpotlight } from '../../hooks/useNodeSpotlight'
 
@@ -30,6 +32,11 @@ const nodeTypes: NodeTypes = {
   pushNode: PushNode,
   deployNode: DeployNode,
   verifyNode: VerifyNode,
+}
+
+const edgeTypes = {
+  animated: AnimatedFlowEdge,
+  failed: FailedEdge,
 }
 
 const NODE_WIDTH = 180
@@ -87,6 +94,7 @@ function PipelineFlowInner({ nodes, edges, onNodeClick }: PipelineFlowProps) {
       nodes={spotlightNodes}
       edges={spotlightEdges}
       nodeTypes={nodeTypes}
+      edgeTypes={edgeTypes}
       onNodeClick={handleNodeClick}
       onNodeMouseEnter={onNodeMouseEnter}
       onNodeMouseLeave={onNodeMouseLeave}

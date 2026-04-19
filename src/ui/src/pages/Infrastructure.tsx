@@ -16,6 +16,8 @@ import { useCascadeAnimation } from '../hooks/useCascadeAnimation'
 import { useNodeSpotlight } from '../hooks/useNodeSpotlight'
 import '@xyflow/react/dist/style.css'
 import { VpcNode, ServiceNode, SecurityNode } from '../components/flow/nodes/InfraNodes'
+import { AnimatedFlowEdge } from '../components/flow/edges/AnimatedEdge'
+import { DashedEdge } from '../components/flow/edges/DashedEdge'
 import { StatusDot } from '../components/shared/StatusDot'
 import { topologyNodes, topologyEdges, type InfraNodeData } from '../mocks/topology'
 
@@ -23,6 +25,11 @@ const nodeTypes: NodeTypes = {
   vpc: VpcNode,
   service: ServiceNode,
   security: SecurityNode,
+}
+
+const edgeTypes = {
+  animated: AnimatedFlowEdge,
+  dashed: DashedEdge,
 }
 
 const typeLabel: Record<string, string> = {
@@ -198,6 +205,7 @@ function InfraFlowInner({
       nodes={spotlightNodes}
       edges={spotlightEdges}
       nodeTypes={nodeTypes}
+      edgeTypes={edgeTypes}
       onNodeClick={onNodeClick}
       onNodeMouseEnter={onNodeMouseEnter}
       onNodeMouseLeave={onNodeMouseLeave}

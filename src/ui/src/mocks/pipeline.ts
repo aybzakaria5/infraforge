@@ -131,11 +131,11 @@ export const successPipelineNodes: Node[] = [
 ]
 
 export const successPipelineEdges: Edge[] = [
-  { id: 'pe-s-1', source: 'pipe-s-git', target: 'pipe-s-build', type: 'smoothstep', animated: true, style: { stroke: '#22c55e' } },
-  { id: 'pe-s-2', source: 'pipe-s-build', target: 'pipe-s-scan', type: 'smoothstep', animated: true, style: { stroke: '#22c55e' } },
-  { id: 'pe-s-3', source: 'pipe-s-scan', target: 'pipe-s-push', type: 'smoothstep', animated: true, style: { stroke: '#22c55e' } },
-  { id: 'pe-s-4', source: 'pipe-s-push', target: 'pipe-s-deploy', type: 'smoothstep', animated: true, style: { stroke: '#22c55e' } },
-  { id: 'pe-s-5', source: 'pipe-s-deploy', target: 'pipe-s-verify', type: 'smoothstep', animated: true, style: { stroke: '#22c55e' } },
+  { id: 'pe-s-1', source: 'pipe-s-git', target: 'pipe-s-build', type: 'animated', style: { stroke: '#22c55e' } },
+  { id: 'pe-s-2', source: 'pipe-s-build', target: 'pipe-s-scan', type: 'animated', style: { stroke: '#22c55e' } },
+  { id: 'pe-s-3', source: 'pipe-s-scan', target: 'pipe-s-push', type: 'animated', style: { stroke: '#22c55e' } },
+  { id: 'pe-s-4', source: 'pipe-s-push', target: 'pipe-s-deploy', type: 'animated', style: { stroke: '#22c55e' } },
+  { id: 'pe-s-5', source: 'pipe-s-deploy', target: 'pipe-s-verify', type: 'animated', style: { stroke: '#22c55e' } },
 ]
 
 // Running pipeline (dep-f1e2d3c400000004, worker-v2-canary)
@@ -223,10 +223,10 @@ export const runningPipelineNodes: Node[] = [
 ]
 
 export const runningPipelineEdges: Edge[] = [
-  { id: 'pe-r-1', source: 'pipe-r-git', target: 'pipe-r-build', type: 'smoothstep', animated: true, style: { stroke: '#22c55e' } },
-  { id: 'pe-r-2', source: 'pipe-r-build', target: 'pipe-r-scan', type: 'smoothstep', animated: true, style: { stroke: '#22c55e' } },
-  { id: 'pe-r-3', source: 'pipe-r-scan', target: 'pipe-r-push', type: 'smoothstep', animated: true, style: { stroke: '#22c55e' } },
-  { id: 'pe-r-4', source: 'pipe-r-push', target: 'pipe-r-deploy', type: 'smoothstep', animated: true, style: { stroke: '#3b82f6' } },
+  { id: 'pe-r-1', source: 'pipe-r-git', target: 'pipe-r-build', type: 'animated', style: { stroke: '#22c55e' } },
+  { id: 'pe-r-2', source: 'pipe-r-build', target: 'pipe-r-scan', type: 'animated', style: { stroke: '#22c55e' } },
+  { id: 'pe-r-3', source: 'pipe-r-scan', target: 'pipe-r-push', type: 'animated', style: { stroke: '#22c55e' } },
+  { id: 'pe-r-4', source: 'pipe-r-push', target: 'pipe-r-deploy', type: 'animated', style: { stroke: '#3b82f6' } },
   { id: 'pe-r-5', source: 'pipe-r-deploy', target: 'pipe-r-verify', type: 'smoothstep' },
 ]
 
@@ -315,9 +315,9 @@ export const failedPipelineNodes: Node[] = [
 ]
 
 export const failedPipelineEdges: Edge[] = [
-  { id: 'pe-f-1', source: 'pipe-f-git', target: 'pipe-f-build', type: 'smoothstep', animated: true, style: { stroke: '#22c55e' } },
-  { id: 'pe-f-2', source: 'pipe-f-build', target: 'pipe-f-scan', type: 'smoothstep', animated: true, style: { stroke: '#22c55e' } },
-  { id: 'pe-f-3', source: 'pipe-f-scan', target: 'pipe-f-push', type: 'smoothstep', animated: true, style: { stroke: '#22c55e' } },
-  { id: 'pe-f-4', source: 'pipe-f-push', target: 'pipe-f-deploy', type: 'smoothstep', animated: true, style: { stroke: '#22c55e' } },
-  { id: 'pe-f-5', source: 'pipe-f-deploy', target: 'pipe-f-verify', type: 'smoothstep', style: { stroke: '#ef4444' } },
+  { id: 'pe-f-1', source: 'pipe-f-git', target: 'pipe-f-build', type: 'animated', style: { stroke: '#22c55e' } },
+  { id: 'pe-f-2', source: 'pipe-f-build', target: 'pipe-f-scan', type: 'animated', style: { stroke: '#22c55e' } },
+  { id: 'pe-f-3', source: 'pipe-f-scan', target: 'pipe-f-push', type: 'animated', style: { stroke: '#22c55e' } },
+  { id: 'pe-f-4', source: 'pipe-f-push', target: 'pipe-f-deploy', type: 'animated', style: { stroke: '#22c55e' } },
+  { id: 'pe-f-5', source: 'pipe-f-deploy', target: 'pipe-f-verify', type: 'failed', style: { stroke: '#ef4444' } },
 ]

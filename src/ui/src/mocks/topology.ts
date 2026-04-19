@@ -293,27 +293,27 @@ export const topologyNodes: Node<InfraNodeData>[] = [
 ]
 
 export const topologyEdges: Edge[] = [
-  // Route53 → ALB
-  { id: 'e-r53-alb', source: 'route53-infraforge', target: 'alb-infraforge-prod', type: 'smoothstep', animated: true, style: { stroke: '#22c55e' } },
+  // Route53 → ALB (active traffic)
+  { id: 'e-r53-alb', source: 'route53-infraforge', target: 'alb-infraforge-prod', type: 'animated', style: { stroke: '#22c55e' } },
 
   // ALB → public subnets
   { id: 'e-alb-pub1a', source: 'alb-infraforge-prod', target: 'subnet-pub-1a', type: 'smoothstep' },
   { id: 'e-alb-pub1b', source: 'alb-infraforge-prod', target: 'subnet-pub-1b', type: 'smoothstep' },
   { id: 'e-alb-pub1c', source: 'alb-infraforge-prod', target: 'subnet-pub-1c', type: 'smoothstep' },
 
-  // Public subnets → private subnets (traffic flow)
-  { id: 'e-pub1a-priv1a', source: 'subnet-pub-1a', target: 'subnet-priv-1a', type: 'smoothstep', style: { strokeDasharray: '5 5' } },
-  { id: 'e-pub1b-priv1b', source: 'subnet-pub-1b', target: 'subnet-priv-1b', type: 'smoothstep', style: { strokeDasharray: '5 5' } },
-  { id: 'e-pub1c-priv1c', source: 'subnet-pub-1c', target: 'subnet-priv-1c', type: 'smoothstep', style: { strokeDasharray: '5 5' } },
+  // Public subnets → private subnets (security boundary)
+  { id: 'e-pub1a-priv1a', source: 'subnet-pub-1a', target: 'subnet-priv-1a', type: 'dashed' },
+  { id: 'e-pub1b-priv1b', source: 'subnet-pub-1b', target: 'subnet-priv-1b', type: 'dashed' },
+  { id: 'e-pub1c-priv1c', source: 'subnet-pub-1c', target: 'subnet-priv-1c', type: 'dashed' },
 
   // Private subnets → NAT gateway
   { id: 'e-priv1a-nat', source: 'subnet-priv-1a', target: 'nat-gw-01', type: 'smoothstep' },
 
-  // ALB → EKS
-  { id: 'e-alb-eks', source: 'alb-infraforge-prod', target: 'eks-infraforge-prod', type: 'smoothstep', animated: true, style: { stroke: '#22c55e' } },
+  // ALB → EKS (active traffic)
+  { id: 'e-alb-eks', source: 'alb-infraforge-prod', target: 'eks-infraforge-prod', type: 'animated', style: { stroke: '#22c55e' } },
 
-  // EKS → RDS
-  { id: 'e-eks-rds', source: 'eks-infraforge-prod', target: 'rds-infraforge-prod', type: 'smoothstep', animated: true, style: { stroke: '#22c55e' } },
+  // EKS → RDS (active traffic)
+  { id: 'e-eks-rds', source: 'eks-infraforge-prod', target: 'rds-infraforge-prod', type: 'animated', style: { stroke: '#22c55e' } },
 
   // EKS → ECR (pulls images)
   { id: 'e-eks-ecr', source: 'eks-infraforge-prod', target: 'ecr-infraforge', type: 'smoothstep' },
@@ -321,20 +321,20 @@ export const topologyEdges: Edge[] = [
   // EKS → S3 artifacts
   { id: 'e-eks-s3', source: 'eks-infraforge-prod', target: 's3-infraforge-artifacts', type: 'smoothstep' },
 
-  // IAM → EKS (dashed security links)
-  { id: 'e-iam-cluster-eks', source: 'iam-eks-cluster-role', target: 'eks-infraforge-prod', type: 'smoothstep', style: { strokeDasharray: '5 5' }, label: 'cluster role' },
-  { id: 'e-iam-node-eks', source: 'iam-eks-node-role', target: 'eks-infraforge-prod', type: 'smoothstep', style: { strokeDasharray: '5 5' }, label: 'node role' },
+  // IAM → EKS (security links)
+  { id: 'e-iam-cluster-eks', source: 'iam-eks-cluster-role', target: 'eks-infraforge-prod', type: 'dashed', label: 'cluster role' },
+  { id: 'e-iam-node-eks', source: 'iam-eks-node-role', target: 'eks-infraforge-prod', type: 'dashed', label: 'node role' },
 
   // IAM node role → ECR (image pull)
-  { id: 'e-iam-node-ecr', source: 'iam-eks-node-role', target: 'ecr-infraforge', type: 'smoothstep', style: { strokeDasharray: '5 5' } },
+  { id: 'e-iam-node-ecr', source: 'iam-eks-node-role', target: 'ecr-infraforge', type: 'dashed' },
 
   // KMS → EKS (encryption)
-  { id: 'e-kms-eks', source: 'kms-infraforge', target: 'eks-infraforge-prod', type: 'smoothstep', style: { strokeDasharray: '5 5' }, label: 'encryption' },
+  { id: 'e-kms-eks', source: 'kms-infraforge', target: 'eks-infraforge-prod', type: 'dashed', label: 'encryption' },
 
   // KMS → RDS (encryption)
-  { id: 'e-kms-rds', source: 'kms-infraforge', target: 'rds-infraforge-prod', type: 'smoothstep', style: { strokeDasharray: '5 5' } },
+  { id: 'e-kms-rds', source: 'kms-infraforge', target: 'rds-infraforge-prod', type: 'dashed' },
 
   // RDS sits in private subnets
-  { id: 'e-rds-priv1a', source: 'rds-infraforge-prod', target: 'subnet-priv-1a', type: 'smoothstep', style: { strokeDasharray: '5 5' } },
-  { id: 'e-rds-priv1b', source: 'rds-infraforge-prod', target: 'subnet-priv-1b', type: 'smoothstep', style: { strokeDasharray: '5 5' } },
+  { id: 'e-rds-priv1a', source: 'rds-infraforge-prod', target: 'subnet-priv-1a', type: 'dashed' },
+  { id: 'e-rds-priv1b', source: 'rds-infraforge-prod', target: 'subnet-priv-1b', type: 'dashed' },
 ]
