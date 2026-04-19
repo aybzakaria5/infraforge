@@ -3,6 +3,8 @@ import {
   ReactFlow,
   Background,
   BackgroundVariant,
+  useReactFlow,
+  ReactFlowProvider,
   type Node,
   type Edge,
   type NodeTypes,
@@ -30,6 +32,7 @@ const nodeTypes: NodeTypes = {
 
 const NODE_WIDTH = 180
 const NODE_HEIGHT = 64
+const SNAP_GRID: [number, number] = [16, 16]
 
 function layoutPipeline(nodes: Node[], edges: Edge[]): Node[] {
   const g = new dagre.graphlib.Graph()
@@ -56,38 +59,53 @@ interface PipelineFlowProps {
   onNodeClick?: (nodeId: string) => void
 }
 
-export const PipelineFlow = memo(function PipelineFlow({ nodes, edges, onNodeClick }: PipelineFlowProps) {
+function PipelineFlowInner({ nodes, edges, onNodeClick }: PipelineFlowProps) {
   const layoutNodes = useMemo(() => layoutPipeline(nodes, edges), [nodes, edges])
+  const { fitView } = useReactFlow()
 
   const handleNodeClick: NodeMouseHandler = useCallback(
     (_, node) => onNodeClick?.(node.id),
     [onNodeClick],
   )
 
+  const onInit = useCallback(() => {
+    setTimeout(() => fitView({ duration: 800, padding: 0.2 }), 50)
+  }, [fitView])
+
+  return (
+    <ReactFlow
+      nodes={layoutNodes}
+      edges={edges}
+      nodeTypes={nodeTypes}
+      onNodeClick={handleNodeClick}
+      onInit={onInit}
+      nodesDraggable
+      nodesConnectable={false}
+      panOnDrag
+      panOnScroll={false}
+      zoomOnScroll
+      zoomOnPinch
+      zoomOnDoubleClick={false}
+      minZoom={0.1}
+      maxZoom={4}
+      snapToGrid
+      snapGrid={SNAP_GRID}
+      selectionOnDrag={false}
+      onlyRenderVisibleElements
+      proOptions={{ hideAttribution: true }}
+      defaultEdgeOptions={{ type: 'smoothstep', style: { strokeWidth: 1.5 } }}
+    >
+      <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
+    </ReactFlow>
+  )
+}
+
+export const PipelineFlow = memo(function PipelineFlow(props: PipelineFlowProps) {
   return (
     <div className="h-[200px] w-full rounded-[6px] border border-border-default overflow-hidden">
-      <ReactFlow
-        nodes={layoutNodes}
-        edges={edges}
-        nodeTypes={nodeTypes}
-        onNodeClick={handleNodeClick}
-        fitView
-        fitViewOptions={{ padding: 0.2 }}
-        nodesDraggable
-        nodesConnectable={false}
-        panOnDrag
-        zoomOnScroll
-        zoomOnPinch
-        zoomOnDoubleClick={false}
-        minZoom={0.3}
-        maxZoom={2}
-        selectionOnDrag={false}
-        onlyRenderVisibleElements
-        proOptions={{ hideAttribution: true }}
-        defaultEdgeOptions={{ type: 'smoothstep', style: { strokeWidth: 1.5 } }}
-      >
-        <Background variant={BackgroundVariant.Dots} gap={16} size={1} />
-      </ReactFlow>
+      <ReactFlowProvider>
+        <PipelineFlowInner {...props} />
+      </ReactFlowProvider>
     </div>
   )
 })

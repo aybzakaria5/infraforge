@@ -5,6 +5,8 @@ import {
   BackgroundVariant,
   MiniMap,
   Controls,
+  ReactFlowProvider,
+  useReactFlow,
   type Node,
   type NodeTypes,
   type NodeMouseHandler,
@@ -164,6 +166,58 @@ function CostSummary() {
   )
 }
 
+function InfraFlowInner({
+  onNodeClick,
+  miniMapNodeColor,
+}: {
+  onNodeClick: NodeMouseHandler
+  miniMapNodeColor: (node: Node) => string
+}) {
+  const { fitView } = useReactFlow()
+
+  const onInit = useCallback(() => {
+    setTimeout(() => fitView({ duration: 800, padding: 0.2 }), 50)
+  }, [fitView])
+
+  return (
+    <ReactFlow
+      nodes={topologyNodes}
+      edges={topologyEdges}
+      nodeTypes={nodeTypes}
+      onNodeClick={onNodeClick}
+      onInit={onInit}
+      nodesDraggable
+      nodesConnectable={false}
+      panOnDrag
+      panOnScroll={false}
+      zoomOnScroll
+      zoomOnPinch
+      zoomOnDoubleClick={false}
+      minZoom={0.1}
+      maxZoom={4}
+      snapToGrid
+      snapGrid={[16, 16]}
+      selectionOnDrag={false}
+      onlyRenderVisibleElements
+      proOptions={{ hideAttribution: true }}
+      defaultEdgeOptions={{
+        type: 'smoothstep',
+        style: { strokeWidth: 1.5 },
+      }}
+    >
+      <Background variant={BackgroundVariant.Dots} gap={20} size={1} />
+      <MiniMap
+        nodeColor={miniMapNodeColor}
+        maskColor="var(--color-bg-primary)"
+        style={{ opacity: 0.6, width: 150, height: 100 }}
+        pannable
+        zoomable
+      />
+      <Controls showInteractive={false} />
+    </ReactFlow>
+  )
+}
+
 export default function Infrastructure() {
   const [selectedNode, setSelectedNode] = useState<Node<InfraNodeData> | null>(null)
   const [loading, setLoading] = useState(true)
@@ -179,7 +233,6 @@ export default function Infrastructure() {
 
   const miniMapNodeColor = useCallback((node: Node) => {
     const d = node.data as InfraNodeData
-    // Accent colors are theme-invariant
     if (d.type === 'vpc') return 'var(--color-border-default)'
     if (d.status === 'error') return '#ef4444'
     if (d.status === 'warning') return '#eab308'
@@ -201,39 +254,11 @@ export default function Infrastructure() {
           <div className="w-full h-full flex items-center justify-center bg-bg-primary">
             <span className="text-[12px] text-text-tertiary animate-pulse">Loading topology...</span>
           </div>
-        ) : <ReactFlow
-          nodes={topologyNodes}
-          edges={topologyEdges}
-          nodeTypes={nodeTypes}
-          onNodeClick={handleNodeClick}
-          fitView
-          fitViewOptions={{ padding: 0.2 }}
-          nodesDraggable
-          nodesConnectable={false}
-          panOnDrag
-          zoomOnScroll
-          zoomOnPinch
-          zoomOnDoubleClick={false}
-          minZoom={0.3}
-          maxZoom={2}
-          selectionOnDrag={false}
-          onlyRenderVisibleElements
-          proOptions={{ hideAttribution: true }}
-          defaultEdgeOptions={{
-            type: 'smoothstep',
-            style: { strokeWidth: 1.5 },
-          }}
-        >
-          <Background variant={BackgroundVariant.Dots} gap={16} size={1} />
-          <MiniMap
-            nodeColor={miniMapNodeColor}
-            maskColor="var(--color-bg-primary)"
-            style={{ opacity: 0.6 }}
-            pannable
-            zoomable
-          />
-          <Controls showInteractive={false} />
-        </ReactFlow>}
+        ) : (
+          <ReactFlowProvider>
+            <InfraFlowInner onNodeClick={handleNodeClick} miniMapNodeColor={miniMapNodeColor} />
+          </ReactFlowProvider>
+        )}
 
         {!loading && <CostSummary />}
       </div>
