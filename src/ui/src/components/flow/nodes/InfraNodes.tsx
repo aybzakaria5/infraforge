@@ -1,5 +1,6 @@
 import { memo } from 'react'
 import { Handle, Position, type NodeProps } from '@xyflow/react'
+import { AnimatedNodeWrapper } from '../AnimatedNode'
 import {
   Cloud,
   Server,
@@ -53,27 +54,30 @@ const handleClass = '!w-1.5 !h-1.5 !bg-border-hover !border-0'
 // --- VPC group node (parent container) ---
 export const VpcNode = memo(function VpcNode({ data }: NodeProps) {
   const d = data as InfraNodeData
+  const idx = (d as Record<string, unknown>)._nodeIndex as number ?? 0
   return (
-    <div className="w-full h-full rounded-[12px] border border-dashed border-border-default bg-bg-primary/85 relative">
-      <Handle type="target" position={Position.Top} className={handleClass} />
-      <Handle type="source" position={Position.Bottom} className={handleClass} />
+    <AnimatedNodeWrapper index={idx}>
+      <div className="w-full h-full rounded-[12px] border border-dashed border-border-default bg-bg-primary/85 relative">
+        <Handle type="target" position={Position.Top} className={handleClass} />
+        <Handle type="source" position={Position.Bottom} className={handleClass} />
 
-      <div className="absolute top-2 left-3 flex items-center gap-1.5">
-        <span className="px-1 py-0.5 rounded bg-accent-info/10 text-accent-info text-[9px] font-medium uppercase tracking-wide">
-          VPC
-        </span>
-        <span className="text-[10px] font-mono text-text-secondary">{d.label}</span>
-        <span
-          className="inline-block w-1.5 h-1.5 rounded-full"
-          style={{ backgroundColor: statusColor[d.status] }}
-        />
-      </div>
+        <div className="absolute top-2 left-3 flex items-center gap-1.5">
+          <span className="px-1 py-0.5 rounded bg-accent-info/10 text-accent-info text-[9px] font-medium uppercase tracking-wide">
+            VPC
+          </span>
+          <span className="text-[10px] font-mono text-text-secondary">{d.label}</span>
+          <span
+            className="inline-block w-1.5 h-1.5 rounded-full"
+            style={{ backgroundColor: statusColor[d.status] }}
+          />
+        </div>
 
-      <div className="absolute bottom-1.5 left-3 flex items-center gap-3 text-[9px] text-text-tertiary font-mono">
-        {d.detail && <span>{d.detail}</span>}
-        {d.cost && <span className="text-accent-warning">{d.cost}</span>}
+        <div className="absolute bottom-1.5 left-3 flex items-center gap-3 text-[9px] text-text-tertiary font-mono">
+          {d.detail && <span>{d.detail}</span>}
+          {d.cost && <span className="text-accent-warning">{d.cost}</span>}
+        </div>
       </div>
-    </div>
+    </AnimatedNodeWrapper>
   )
 })
 
@@ -82,8 +86,10 @@ export const ServiceNode = memo(function ServiceNode({ data }: NodeProps) {
   const d = data as InfraNodeData
   const Icon = typeIcon[d.type] || Server
   const accent = typeAccent[d.type] || 'var(--color-border-default)'
+  const idx = (d as Record<string, unknown>)._nodeIndex as number ?? 0
 
   return (
+    <AnimatedNodeWrapper index={idx}>
     <div
       className="py-1.5 pr-2.5 pl-0 rounded-[6px] border border-border-default bg-bg-tertiary
         transition-[border-color,box-shadow,transform] duration-150 cursor-pointer"
@@ -116,6 +122,7 @@ export const ServiceNode = memo(function ServiceNode({ data }: NodeProps) {
         <div className="pl-2 mt-0.5 text-[10px] font-mono text-accent-warning">{d.cost}</div>
       )}
     </div>
+    </AnimatedNodeWrapper>
   )
 })
 
@@ -124,8 +131,10 @@ export const SecurityNode = memo(function SecurityNode({ data }: NodeProps) {
   const d = data as InfraNodeData
   const Icon = typeIcon[d.type] || Lock
   const accent = typeAccent[d.type] || 'var(--color-accent-neutral)'
+  const idx = (d as Record<string, unknown>)._nodeIndex as number ?? 0
 
   return (
+    <AnimatedNodeWrapper index={idx}>
     <div
       className="py-1.5 pr-2.5 pl-0 rounded-[6px] border border-accent-neutral/30 bg-bg-tertiary
         transition-[border-color,box-shadow,transform] duration-150 cursor-pointer"
@@ -158,5 +167,6 @@ export const SecurityNode = memo(function SecurityNode({ data }: NodeProps) {
         <div className="pl-2 mt-0.5 text-[10px] font-mono text-accent-warning">{d.cost}</div>
       )}
     </div>
+    </AnimatedNodeWrapper>
   )
 })

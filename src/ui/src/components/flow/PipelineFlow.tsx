@@ -20,6 +20,7 @@ import {
   DeployNode,
   VerifyNode,
 } from './nodes/PipelineNodes'
+import { useCascadeAnimation } from '../../hooks/useCascadeAnimation'
 
 const nodeTypes: NodeTypes = {
   gitNode: GitNode,
@@ -44,11 +45,12 @@ function layoutPipeline(nodes: Node[], edges: Edge[]): Node[] {
 
   dagre.layout(g)
 
-  return nodes.map(n => {
+  return nodes.map((n, i) => {
     const pos = g.node(n.id)
     return {
       ...n,
       position: { x: pos.x - NODE_WIDTH / 2, y: pos.y - NODE_HEIGHT / 2 },
+      data: { ...n.data, _nodeIndex: i },
     }
   })
 }
@@ -62,6 +64,7 @@ interface PipelineFlowProps {
 function PipelineFlowInner({ nodes, edges, onNodeClick }: PipelineFlowProps) {
   const layoutNodes = useMemo(() => layoutPipeline(nodes, edges), [nodes, edges])
   const { fitView } = useReactFlow()
+  const { animatedEdges } = useCascadeAnimation(layoutNodes.length, edges)
 
   const handleNodeClick: NodeMouseHandler = useCallback(
     (_, node) => onNodeClick?.(node.id),
@@ -75,7 +78,7 @@ function PipelineFlowInner({ nodes, edges, onNodeClick }: PipelineFlowProps) {
   return (
     <ReactFlow
       nodes={layoutNodes}
-      edges={edges}
+      edges={animatedEdges}
       nodeTypes={nodeTypes}
       onNodeClick={handleNodeClick}
       onInit={onInit}

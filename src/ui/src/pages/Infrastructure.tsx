@@ -12,6 +12,7 @@ import {
   type NodeMouseHandler,
 } from '@xyflow/react'
 import { X, ExternalLink, DollarSign, FolderGit2 } from 'lucide-react'
+import { useCascadeAnimation } from '../hooks/useCascadeAnimation'
 import '@xyflow/react/dist/style.css'
 import { VpcNode, ServiceNode, SecurityNode } from '../components/flow/nodes/InfraNodes'
 import { StatusDot } from '../components/shared/StatusDot'
@@ -175,14 +176,20 @@ function InfraFlowInner({
 }) {
   const { fitView } = useReactFlow()
 
+  const indexedNodes = useMemo(
+    () => topologyNodes.map((n, i) => ({ ...n, data: { ...n.data, _nodeIndex: i } })),
+    [],
+  )
+  const { animatedEdges } = useCascadeAnimation(indexedNodes.length, topologyEdges)
+
   const onInit = useCallback(() => {
     setTimeout(() => fitView({ duration: 800, padding: 0.2 }), 50)
   }, [fitView])
 
   return (
     <ReactFlow
-      nodes={topologyNodes}
-      edges={topologyEdges}
+      nodes={indexedNodes}
+      edges={animatedEdges}
       nodeTypes={nodeTypes}
       onNodeClick={onNodeClick}
       onInit={onInit}

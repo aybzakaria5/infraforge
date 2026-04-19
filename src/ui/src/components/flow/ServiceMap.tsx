@@ -1,4 +1,4 @@
-import { memo, useCallback } from 'react'
+import { memo, useCallback, useMemo } from 'react'
 import {
   ReactFlow,
   Background,
@@ -10,6 +10,7 @@ import {
 import '@xyflow/react/dist/style.css'
 import { MicroserviceNode } from './nodes/MicroserviceNode'
 import { getServiceMap } from '../../mocks/servicemap'
+import { useCascadeAnimation } from '../../hooks/useCascadeAnimation'
 
 const nodeTypes: NodeTypes = {
   microservice: MicroserviceNode,
@@ -25,8 +26,14 @@ interface ServiceMapProps {
 }
 
 function ServiceMapInner({ envId }: ServiceMapProps) {
-  const { nodes, edges } = getServiceMap(envId)
+  const { nodes: rawNodes, edges } = getServiceMap(envId)
   const { fitView } = useReactFlow()
+
+  const nodes = useMemo(
+    () => rawNodes.map((n, i) => ({ ...n, data: { ...n.data, _nodeIndex: i } })),
+    [rawNodes],
+  )
+  const { animatedEdges } = useCascadeAnimation(nodes.length, edges)
 
   const onInit = useCallback(() => {
     setTimeout(() => fitView({ duration: 800, padding: 0.25 }), 50)
@@ -35,7 +42,7 @@ function ServiceMapInner({ envId }: ServiceMapProps) {
   return (
     <ReactFlow
       nodes={nodes}
-      edges={edges}
+      edges={animatedEdges}
       nodeTypes={nodeTypes}
       defaultEdgeOptions={defaultEdgeOptions}
       onInit={onInit}

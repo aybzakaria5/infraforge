@@ -1,5 +1,6 @@
 import { memo } from 'react'
 import { Handle, Position, type NodeProps } from '@xyflow/react'
+import { AnimatedNodeWrapper } from '../AnimatedNode'
 import {
   GitCommit,
   Hammer,
@@ -64,8 +65,10 @@ function NodeShell({
   const borderLeft = leftBorderColor[data.status] || leftBorderColor.pending
   const failedShadow = data.status === 'failed' ? 'shadow-[0_0_12px_rgba(239,68,68,0.2)]' : ''
   const pendingOpacity = data.status === 'pending' ? 'opacity-50' : ''
+  const idx = (data as Record<string, unknown>)._nodeIndex as number ?? 0
 
   return (
+    <AnimatedNodeWrapper index={idx}>
     <div
       className={`relative rounded-[6px] border border-border-default bg-bg-tertiary
         transition-[border-color,box-shadow,transform] duration-150 cursor-pointer ${failedShadow} ${pendingOpacity}`}
@@ -92,6 +95,7 @@ function NodeShell({
         <span className="font-mono">{formatDur(data.duration_sec)}</span>
       </div>
     </div>
+    </AnimatedNodeWrapper>
   )
 }
 
