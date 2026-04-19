@@ -11,6 +11,7 @@ import '@xyflow/react/dist/style.css'
 import { MicroserviceNode } from './nodes/MicroserviceNode'
 import { getServiceMap } from '../../mocks/servicemap'
 import { useCascadeAnimation } from '../../hooks/useCascadeAnimation'
+import { useNodeSpotlight } from '../../hooks/useNodeSpotlight'
 
 const nodeTypes: NodeTypes = {
   microservice: MicroserviceNode,
@@ -34,6 +35,12 @@ function ServiceMapInner({ envId }: ServiceMapProps) {
     [rawNodes],
   )
   const { animatedEdges } = useCascadeAnimation(nodes.length, edges)
+  const {
+    spotlightNodes,
+    spotlightEdges,
+    onNodeMouseEnter,
+    onNodeMouseLeave,
+  } = useNodeSpotlight(nodes, animatedEdges)
 
   const onInit = useCallback(() => {
     setTimeout(() => fitView({ duration: 800, padding: 0.25 }), 50)
@@ -41,10 +48,12 @@ function ServiceMapInner({ envId }: ServiceMapProps) {
 
   return (
     <ReactFlow
-      nodes={nodes}
-      edges={animatedEdges}
+      nodes={spotlightNodes}
+      edges={spotlightEdges}
       nodeTypes={nodeTypes}
       defaultEdgeOptions={defaultEdgeOptions}
+      onNodeMouseEnter={onNodeMouseEnter}
+      onNodeMouseLeave={onNodeMouseLeave}
       onInit={onInit}
       nodesDraggable
       nodesConnectable={false}

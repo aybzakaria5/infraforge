@@ -21,6 +21,7 @@ import {
   VerifyNode,
 } from './nodes/PipelineNodes'
 import { useCascadeAnimation } from '../../hooks/useCascadeAnimation'
+import { useNodeSpotlight } from '../../hooks/useNodeSpotlight'
 
 const nodeTypes: NodeTypes = {
   gitNode: GitNode,
@@ -65,6 +66,12 @@ function PipelineFlowInner({ nodes, edges, onNodeClick }: PipelineFlowProps) {
   const layoutNodes = useMemo(() => layoutPipeline(nodes, edges), [nodes, edges])
   const { fitView } = useReactFlow()
   const { animatedEdges } = useCascadeAnimation(layoutNodes.length, edges)
+  const {
+    spotlightNodes,
+    spotlightEdges,
+    onNodeMouseEnter,
+    onNodeMouseLeave,
+  } = useNodeSpotlight(layoutNodes, animatedEdges)
 
   const handleNodeClick: NodeMouseHandler = useCallback(
     (_, node) => onNodeClick?.(node.id),
@@ -77,10 +84,12 @@ function PipelineFlowInner({ nodes, edges, onNodeClick }: PipelineFlowProps) {
 
   return (
     <ReactFlow
-      nodes={layoutNodes}
-      edges={animatedEdges}
+      nodes={spotlightNodes}
+      edges={spotlightEdges}
       nodeTypes={nodeTypes}
       onNodeClick={handleNodeClick}
+      onNodeMouseEnter={onNodeMouseEnter}
+      onNodeMouseLeave={onNodeMouseLeave}
       onInit={onInit}
       nodesDraggable
       nodesConnectable={false}

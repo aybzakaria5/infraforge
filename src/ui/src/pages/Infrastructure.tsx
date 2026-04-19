@@ -13,6 +13,7 @@ import {
 } from '@xyflow/react'
 import { X, ExternalLink, DollarSign, FolderGit2 } from 'lucide-react'
 import { useCascadeAnimation } from '../hooks/useCascadeAnimation'
+import { useNodeSpotlight } from '../hooks/useNodeSpotlight'
 import '@xyflow/react/dist/style.css'
 import { VpcNode, ServiceNode, SecurityNode } from '../components/flow/nodes/InfraNodes'
 import { StatusDot } from '../components/shared/StatusDot'
@@ -181,6 +182,12 @@ function InfraFlowInner({
     [],
   )
   const { animatedEdges } = useCascadeAnimation(indexedNodes.length, topologyEdges)
+  const {
+    spotlightNodes,
+    spotlightEdges,
+    onNodeMouseEnter,
+    onNodeMouseLeave,
+  } = useNodeSpotlight(indexedNodes, animatedEdges)
 
   const onInit = useCallback(() => {
     setTimeout(() => fitView({ duration: 800, padding: 0.2 }), 50)
@@ -188,10 +195,12 @@ function InfraFlowInner({
 
   return (
     <ReactFlow
-      nodes={indexedNodes}
-      edges={animatedEdges}
+      nodes={spotlightNodes}
+      edges={spotlightEdges}
       nodeTypes={nodeTypes}
       onNodeClick={onNodeClick}
+      onNodeMouseEnter={onNodeMouseEnter}
+      onNodeMouseLeave={onNodeMouseLeave}
       onInit={onInit}
       nodesDraggable
       nodesConnectable={false}
